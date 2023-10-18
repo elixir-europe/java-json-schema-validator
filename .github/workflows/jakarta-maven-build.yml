@@ -20,6 +20,7 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
+        branch: jakarta
         server-id: gitlab-bsc-maven # Value of the distributionManagement/repository/id field of the pom.xml
         server-username: MAVEN_USERNAME
         server-password: MAVEN_PASSWORD
