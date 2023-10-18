@@ -52,4 +52,16 @@
             <type>jar</type>
         </dependency>
     </dependencies>
+    
+    <distributionManagement>
+        <repository>
+            <id>gitlab-bsc-maven</id>
+            <url>https://inb.bsc.es/maven</url>
+        </repository>
+        <snapshotRepository>
+            <id>gitlab-bsc-maven</id>
+            <url>https://inb.bsc.es/maven</url>
+        </snapshotRepository>
+    </distributionManagement>
+
 </project>
