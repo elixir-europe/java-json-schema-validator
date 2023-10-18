@@ -63,14 +63,14 @@ public class JsonOneOfImpl extends SchemaArrayImpl
     public boolean validate(String jsonPointer, JsonValue value, JsonValue parent, 
             List evaluated, List errors, JsonSchemaValidationCallback callback) {
 
-        int matches = 0;
+        final List<String> matched = new ArrayList();
         
         final List eva = new ArrayList();
         final List<ValidationError> err = new ArrayList<>();
         for (AbstractJsonSchema schema : this) {
             final List e = new ArrayList(evaluated);
             if (schema.validate(jsonPointer, value, parent, e, err, callback)) {
-                matches++;
+                matched.add(schema.getId().toString());
                 eva.clear();
                 eva.addAll(e);
             }
@@ -79,16 +79,23 @@ public class JsonOneOfImpl extends SchemaArrayImpl
         // An instance validates successfully if it validates against 
         // exactly one schema defined by this keyword's value
         
-        if (matches != 1) {
-            errors.addAll(err);
-            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
-                    ValidationMessage.OBJECT_ONE_OF_CONSTRAINT_MSG));
-            return false;
+        final int matches = matched.size();
+        switch (matches) {
+            case 1:
+                eva.removeAll(evaluated);
+                evaluated.addAll(eva);
+                return true;
+            case 0:
+                errors.addAll(err);
+                errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                        ValidationMessage.OBJECT_ONE_OF_CONSTRAINT_MSG, "no matched schemas found"));
+                break;
+            default:
+                errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                        ValidationMessage.OBJECT_ONE_OF_CONSTRAINT_MSG,
+                        String.format("several schemas matches (%s)", String.join(",", matched))));
+                break;
         }
-        
-        eva.removeAll(evaluated);
-        evaluated.addAll(eva);
-        
-        return true;
+        return false;
     }
 }
