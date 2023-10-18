@@ -50,6 +50,12 @@ import java.util.Map;
     
 public class DefaultJsonSchemaLocator extends JsonSchemaLocator {
 
+    private final static HttpClient http_client = 
+            HttpClient.newBuilder()
+                .followRedirects(HttpClient.Redirect.NORMAL)
+                .connectTimeout(Duration.ofSeconds(30))
+                .build();
+
     protected final Map<URI, JsonValue> schemas;
 
     public DefaultJsonSchemaLocator(URI uri) {
