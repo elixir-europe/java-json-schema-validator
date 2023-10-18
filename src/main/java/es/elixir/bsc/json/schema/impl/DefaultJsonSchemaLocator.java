@@ -36,6 +36,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,6 +49,12 @@ import java.util.Map;
  */
     
 public class DefaultJsonSchemaLocator extends JsonSchemaLocator {
+
+    private final static HttpClient http_client = 
+            HttpClient.newBuilder()
+                .followRedirects(HttpClient.Redirect.NORMAL)
+                .connectTimeout(Duration.ofSeconds(30))
+                .build();
 
     protected final Map<URI, JsonValue> schemas;
 
@@ -74,12 +84,33 @@ public class DefaultJsonSchemaLocator extends JsonSchemaLocator {
         
         JsonValue schema = schemas.get(uri);
         if (schema == null) {
-            final JsonReaderFactory factory = Json.createReaderFactory(Collections.EMPTY_MAP);
-            try (InputStream in = uri.toURL().openStream()){
-                final JsonReader reader = factory.createReader(in);
-                schema = reader.readValue();
-                setSchema(schema);
+            final InputStream in;
+            final String scheme = uri.getScheme();
+            if ("http".equals(scheme) || "https".equals(scheme)) {
+                try {
+                    final HttpResponse<InputStream> response = 
+                            http_client.send(HttpRequest.newBuilder(uri).build(), 
+                                    HttpResponse.BodyHandlers.ofInputStream());
+                    if (response == null) {
+                        throw new IOException(String.format("no respnse from %s", uri));
+                    }
+
+                    if (response.statusCode() >= 300) {
+                        throw new IOException(String.format("error reading from %s %d", uri, response.statusCode()));
+                    }
+                    in = response.body();
+                } catch (InterruptedException ex) {
+                    throw new IOException(String.format("no respnse from %s", uri));
+                }
+            } else {
+                // not http schemas like "file" etc...
+                in = uri.toURL().openStream();
             }
+            
+            final JsonReaderFactory factory = Json.createReaderFactory(Collections.EMPTY_MAP);
+            final JsonReader reader = factory.createReader(in);
+            schema = reader.readValue();
+            setSchema(schema);
         }
 
         if ("/".endsWith(jsonPointer)) {
