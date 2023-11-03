@@ -87,13 +87,13 @@ public class JsonReferenceImpl extends AbstractJsonReferenceImpl implements Json
                 JsonValue jsubschema = ref_locator.getSchema(ref_pointer);
                 if (jsubschema == null) {
                     throw new JsonSchemaException(
-                            new ParsingError(ParsingMessage.UNRESOLVABLE_REFERENCE, new Object[] {ref}));
+                            new ParsingError(ParsingMessage.UNRESOLVABLE_REFERENCE, ref));
                 }
 
                 schema = parser.parse(ref_locator, getParent(), ref_pointer, jsubschema, null);
             } catch(IOException | JsonException | IllegalArgumentException ex) {
                 throw new JsonSchemaException(
-                    new ParsingError(ParsingMessage.INVALID_REFERENCE, new Object[] {ref}));
+                    new ParsingError(ParsingMessage.INVALID_REFERENCE, ref));
             }
         }
         return schema;
@@ -132,7 +132,7 @@ public class JsonReferenceImpl extends AbstractJsonReferenceImpl implements Json
             }
         } catch(JsonException | IllegalArgumentException | URISyntaxException ex) {
             throw new JsonSchemaException(
-                    new ParsingError(ParsingMessage.INVALID_REFERENCE, new Object[] {ref}));
+                    new ParsingError(ParsingMessage.INVALID_REFERENCE, ref));
         }
         
         return this;

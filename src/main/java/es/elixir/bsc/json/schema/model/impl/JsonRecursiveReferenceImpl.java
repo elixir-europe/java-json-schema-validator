@@ -97,7 +97,7 @@ public class JsonRecursiveReferenceImpl extends AbstractJsonReferenceImpl
         final JsonString jrecursive_ref = JsonSchemaUtil.check(object.get(RECURSIVE_REF), JsonValue.ValueType.STRING);
         if (!"#".equals(jrecursive_ref.getString())) {
             throw new JsonSchemaException(
-                    new ParsingError(ParsingMessage.INVALID_REFERENCE, new Object[] {jrecursive_ref.getString()}));
+                    new ParsingError(ParsingMessage.INVALID_REFERENCE, jrecursive_ref.getString()));
         }
         
         return this;

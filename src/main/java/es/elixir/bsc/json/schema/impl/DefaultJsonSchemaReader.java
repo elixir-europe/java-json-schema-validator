@@ -79,10 +79,10 @@ public class DefaultJsonSchemaReader implements JsonSchemaReader {
                 obj = locator.getSchema("/");
             } catch (IOException ex) {
                 throw new JsonSchemaException(
-                        new ParsingError(ParsingMessage.UNRESOLVABLE_SCHEMA, new Object[] {locator.uri}));
+                        new ParsingError(ParsingMessage.UNRESOLVABLE_SCHEMA, locator.uri));
             } catch (JsonException ex) {
                 throw new JsonSchemaException(
-                        new ParsingError(ParsingMessage.JSON_PARSING_ERROR, new Object[] {ex.getMessage()}));
+                        new ParsingError(ParsingMessage.JSON_PARSING_ERROR, ex.getMessage()));
             }
             schema = new DefaultJsonSchemaParser(properties).parse(locator, obj);
             schemas.put(locator.uri, schema);

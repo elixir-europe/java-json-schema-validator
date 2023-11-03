@@ -89,7 +89,7 @@ public class JsonAnyOfImpl extends SchemaArrayImpl
                      add(parser.parse(getScope(), parent, getJsonPointer(), value, t));
                 } catch(IllegalArgumentException ex) {
                     throw new JsonSchemaException(
-                        new ParsingError(ParsingMessage.UNKNOWN_OBJECT_TYPE, new Object[] {val}));
+                        new ParsingError(ParsingMessage.UNKNOWN_OBJECT_TYPE, val));
                 }
             }            
         }        
