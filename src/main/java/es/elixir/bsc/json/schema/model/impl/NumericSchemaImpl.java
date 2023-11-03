@@ -32,6 +32,7 @@ import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.NumericSchema;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
+import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import java.math.BigDecimal;
 import jakarta.json.JsonNumber;
 import jakarta.json.JsonObject;
@@ -55,7 +56,7 @@ public abstract class NumericSchemaImpl<T extends Number> extends PrimitiveSchem
     protected Number exclusiveMinimum;
     protected Number exclusiveMaximum;
     
-    public NumericSchemaImpl(JsonSchemaImpl parent, JsonSchemaLocator locator,
+    public NumericSchemaImpl(AbstractJsonSchemaElement parent, JsonSchemaLocator locator,
             String jsonPointer) {
         super(parent, locator, jsonPointer);
     }

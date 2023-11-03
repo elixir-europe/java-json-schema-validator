@@ -41,7 +41,7 @@ public interface JsonSchemaReader {
     /**
      * 
      * @param url the URL to read Json Schema from.
-     * @return
+     * @return parsed JsonSchema object
      * @throws JsonSchemaException 
      */
     JsonSchema read(URL url) throws JsonSchemaException;

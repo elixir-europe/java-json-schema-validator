@@ -42,6 +42,7 @@ import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonDependentProperties;
 import es.elixir.bsc.json.schema.model.JsonSchema;
+import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
@@ -52,6 +53,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import jakarta.json.JsonNumber;
 import static jakarta.json.JsonValue.ValueType.FALSE;
 import static jakarta.json.JsonValue.ValueType.OBJECT;
@@ -77,16 +79,25 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
     private AbstractJsonSchema unevaluatedPropertiesSchema;
     private AbstractJsonSchema propertyNames;
 
-    public JsonObjectSchemaImpl(JsonSchemaImpl parent, JsonSchemaLocator locator,
+    public JsonObjectSchemaImpl(AbstractJsonSchemaElement parent, JsonSchemaLocator locator,
             String jsonPointer) {
         super(parent, locator, jsonPointer);
     }
 
     @Override
+    public Stream<JsonSchemaElement> getChildren() {
+        return Stream.of(
+                super.getChildren(),
+                properties != null ? properties.getChildren() : null,
+                propertyNames != null ? propertyNames.getChildren() : null,
+                patternProperties != null ? patternProperties.getChildren() : null,
+                unevaluatedPropertiesSchema != null ? unevaluatedPropertiesSchema.getChildren() : null,
+                dependentSchemas != null ? dependentSchemas.getChildren() : null)
+                .flatMap(c -> c);
+    }
+    
+    @Override
     public JsonPropertiesImpl getProperties() {
-        if (properties == null) {
-            properties = new JsonPropertiesImpl();
-        }
         return properties;
     }
 
@@ -111,7 +122,8 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
     @Override
     public JsonProperties getDependentSchemas() {
         if (dependentSchemas == null) {
-            dependentSchemas = new JsonPropertiesImpl();
+            dependentSchemas = new JsonPropertiesImpl(this, getScope(), 
+                    getJsonPointer() + "/" + DEPENDENT_SCHEMAS);
         }
         return dependentSchemas;
     }
@@ -119,7 +131,8 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
     @Override
     public JsonDependentProperties getDependentRequired() {
         if (dependentRequired == null) {
-            dependentRequired = new JsonDependentPropertiesImpl();
+            dependentRequired = new JsonDependentPropertiesImpl(this, getScope(), 
+                    getJsonPointer() + "/" + DEPENDENT_REQUIRED);
         }
         return dependentRequired;
     }
@@ -172,7 +185,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
                 switch(subschema.getValueType()) {
                     case OBJECT:
                     case TRUE: 
-                    case FALSE:  parser.parse(getCurrentScope(), parent, getJsonPointer() + "/" + JsonSchema.DEFS + "/" + entry.getKey(), subschema, null);
+                    case FALSE:  parser.parse(getScope(), parent, getJsonPointer() + "/" + JsonSchema.DEFS + "/" + entry.getKey(), subschema, null);
                                  break;
                     default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
                                      new Object[] {entry.getKey(), subschema.getValueType().name(), JsonValue.ValueType.OBJECT.name()}));
@@ -191,7 +204,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
                 switch(subschema.getValueType()) {
                     case OBJECT:
                     case TRUE:
-                    case FALSE:  parser.parse(getCurrentScope(), this, getJsonPointer() + "/definitions/" + entry.getKey(), subschema, null);
+                    case FALSE:  parser.parse(getScope(), this, getJsonPointer() + "/definitions/" + entry.getKey(), subschema, null);
                                  break;
                     default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
                                     new Object[] {entry.getKey(), subschema.getValueType().name(), JsonValue.ValueType.OBJECT.name()}));
@@ -201,7 +214,8 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
         
         final JsonObject jproperties = JsonSchemaUtil.check(object.get(PROPERTIES), ValueType.OBJECT);
         if (jproperties != null) {
-            properties = new JsonPropertiesImpl().read(parser, getCurrentScope(), this, getJsonPointer() + "/" + PROPERTIES, jproperties);
+            properties = new JsonPropertiesImpl(this, getScope(), getJsonPointer() + "/" + PROPERTIES)
+                    .read(parser, jproperties);
         }
 
         final JsonNumber jminProperties = JsonSchemaUtil.check(object.get(MIN_PROPERTIES), ValueType.NUMBER);
@@ -216,7 +230,8 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
 
         final JsonObject jpatternProperties = JsonSchemaUtil.check(object.get(PATTERN_PROPERTIES), ValueType.OBJECT);
         if (jpatternProperties != null) {
-            patternProperties = new JsonPropertiesImpl().read(parser, getCurrentScope(), this, getJsonPointer() + "/" + PATTERN_PROPERTIES, jpatternProperties);
+            patternProperties = new JsonPropertiesImpl(this, getScope(), getJsonPointer() + "/" + DEPENDENT_SCHEMAS)
+                    .read(parser, jpatternProperties);
         }
         
         final JsonArray jrequired = JsonSchemaUtil.check(object.get(REQUIRED), ValueType.ARRAY);
@@ -227,7 +242,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
         final JsonValue jadditionalProperties = object.get(ADDITIONAL_PROPERTIES);
         if (jadditionalProperties != null) {
             switch(jadditionalProperties.getValueType()) {
-                case OBJECT: additionalPropertiesSchema = parser.parse(getCurrentScope(), this, getJsonPointer() + "/" + ADDITIONAL_PROPERTIES, jadditionalProperties, null); break;
+                case OBJECT: additionalPropertiesSchema = parser.parse(getScope(), this, getJsonPointer() + "/" + ADDITIONAL_PROPERTIES, jadditionalProperties, null); break;
                 case TRUE:   additionalProperties = true; break;
                 case FALSE:  additionalProperties = false; break;
                 default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
@@ -238,7 +253,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
         final JsonValue junevaluatedProperties = object.get(UNEVALUATED_PROPERTIES);
         if (junevaluatedProperties != null) {
             switch(junevaluatedProperties.getValueType()) {
-                case OBJECT: unevaluatedPropertiesSchema = parser.parse(getCurrentScope(), this, getJsonPointer() + "/" + UNEVALUATED_PROPERTIES, junevaluatedProperties, type); break;
+                case OBJECT: unevaluatedPropertiesSchema = parser.parse(getScope(), this, getJsonPointer() + "/" + UNEVALUATED_PROPERTIES, junevaluatedProperties, type); break;
                 case TRUE:   unevaluatedProperties = true; break;
                 case FALSE:  unevaluatedProperties = false; break;
                 default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
@@ -249,10 +264,10 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
         final JsonValue jpropertyNames = object.get(PROPERTY_NAMES);
         if (jpropertyNames != null) {
             switch(jpropertyNames.getValueType()) {
-                case OBJECT: propertyNames = new JsonStringSchemaImpl(this, getCurrentScope(), getJsonPointer() + "/" + PROPERTY_NAMES).read(parser, jpropertyNames.asJsonObject(), null);
+                case OBJECT: propertyNames = new JsonStringSchemaImpl(this, getScope(), getJsonPointer() + "/" + PROPERTY_NAMES).read(parser, jpropertyNames.asJsonObject(), null);
                              break;
                 case TRUE:   
-                case FALSE:  propertyNames = new BooleanJsonSchemaImpl(this, getCurrentScope(), getJsonPointer() + "/" + PROPERTY_NAMES).read(parser, jpropertyNames, null);
+                case FALSE:  propertyNames = new BooleanJsonSchemaImpl(this, getScope(), getJsonPointer() + "/" + PROPERTY_NAMES).read(parser, jpropertyNames, null);
                              break;
                 default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
                                    new Object[] {PROPERTY_NAMES, jpropertyNames.getValueType().name(), "either object or boolean"}));
@@ -261,12 +276,14 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
         
         final JsonObject jdependentSchemas = JsonSchemaUtil.check(object.get(DEPENDENT_SCHEMAS), ValueType.OBJECT);
         if (jdependentSchemas != null) {
-            dependentSchemas = new JsonPropertiesImpl().read(parser, getCurrentScope(), this, getJsonPointer() + "/" + DEPENDENT_SCHEMAS, jdependentSchemas);
+            dependentSchemas = new JsonPropertiesImpl(this, getScope(), 
+                    getJsonPointer() + "/" + DEPENDENT_SCHEMAS).read(parser, jdependentSchemas);
         }
 
         final JsonObject jdependentRequired = JsonSchemaUtil.check(object.get(DEPENDENT_REQUIRED), ValueType.OBJECT);
         if (jdependentRequired != null) {
-            dependentRequired = new JsonDependentPropertiesImpl().read(parser, getCurrentScope(), getJsonPointer() + "/" + DEPENDENT_REQUIRED, jdependentRequired);
+            dependentRequired = new JsonDependentPropertiesImpl(this, getScope(), 
+                    getJsonPointer() + "/" + DEPENDENT_REQUIRED).read(parser, jdependentRequired);
         }
         
         final JsonObject jdependencies = JsonSchemaUtil.check(object.get(DEPENDENCIES), ValueType.OBJECT);
@@ -278,7 +295,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
                 switch(value.getValueType()) {
                     case OBJECT:
                     case TRUE:
-                    case FALSE:  final AbstractJsonSchema schema = parser.parse(getCurrentScope(), this, getJsonPointer() + "/" + DEPENDENCIES + "/" + name + "/", value, null);
+                    case FALSE:  final AbstractJsonSchema schema = parser.parse(getScope(), this, getJsonPointer() + "/" + DEPENDENCIES + "/" + name + "/", value, null);
                                  getDependentSchemas().put(name, schema);
                                  break;
                     case ARRAY:  final StringArray arr = new JsonStringArray().read(value.asJsonArray());

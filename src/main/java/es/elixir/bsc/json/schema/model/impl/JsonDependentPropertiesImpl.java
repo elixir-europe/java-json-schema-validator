@@ -31,6 +31,7 @@ import es.elixir.bsc.json.schema.JsonSchemaParser;
 import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.model.JsonDependentProperties;
+import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import es.elixir.bsc.json.schema.model.StringArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
@@ -38,40 +39,54 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Stream;
 
 /**
  * @author Dmitry Repchevsky
  */
 
-public class JsonDependentPropertiesImpl extends LinkedHashMap<String, StringArray>
-                                         implements JsonDependentProperties {
+public class JsonDependentPropertiesImpl extends AbstractJsonSchemaElement
+        implements JsonDependentProperties {
+
+    private final Map<String, StringArray> properties;
+    
+    public JsonDependentPropertiesImpl(AbstractJsonSchema parent, JsonSchemaLocator locator,
+            String jsonPointer) {
+        super(parent, locator, jsonPointer);
+        properties = new LinkedHashMap();
+    }
+    
+    @Override
+    public <T extends JsonSchemaElement> Stream<T> getChildren() {
+        return Stream.of();
+    }
 
     @Override
     public boolean contains(String name) {
-        return super.containsKey(name);
+        return properties.containsKey(name);
     }
 
     @Override
     public StringArray get(String name) {
-        return super.get(name);
+        return properties.get(name);
     }
 
     @Override
     public StringArray put(String name, StringArray schema) {
-        return super.put(name, schema);
+        return properties.put(name, schema);
     }
     @Override
     public StringArray remove(String name) {
-        return super.remove(name);
+        return properties.remove(name);
     }
 
     @Override
     public Iterator<Entry<String, StringArray>> iterator() {
-        return entrySet().iterator();
+        return properties.entrySet().iterator();
     }
     
-    public JsonDependentProperties read(JsonSchemaParser parser, 
-            JsonSchemaLocator locator, String jsonPointer, JsonObject object) throws JsonSchemaException {
+    public JsonDependentProperties read(JsonSchemaParser parser, JsonObject object) 
+            throws JsonSchemaException {
         
         for (Map.Entry<String, JsonValue> entry : object.entrySet()) {
             final String name = entry.getKey();

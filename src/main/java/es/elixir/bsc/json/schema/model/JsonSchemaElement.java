@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -24,6 +24,8 @@
  */
 
 package es.elixir.bsc.json.schema.model;
+import java.net.URI;
+import java.util.stream.Stream;
 
 /**
  * Any parsable Json Schema element (i.g. Schema, Schema properties, etc)
@@ -32,14 +34,9 @@ package es.elixir.bsc.json.schema.model;
  */
 
 public interface JsonSchemaElement {
-    
-    /**
-     * Get the enclosing Json Schema element.
-     * 
-     * @return immediate parent node (element) 
-     */
-    <T extends JsonSchemaElement> T getParent();
-    
+
+    URI getId();
+
     /**
      * Returns Json Pointer to locate Json Schema object in the Json Schema document.
      * The pointer is relative to the schema id.
@@ -47,4 +44,22 @@ public interface JsonSchemaElement {
      * @return Json Pointer to this schema
      */
     String getJsonPointer();
+
+     /**
+     * Get the enclosing Json Schema element.
+     * 
+     * @param <T>
+     * 
+     * @return immediate parent node (element) 
+     */
+    <T extends JsonSchemaElement> T getParent();
+    
+    /**
+     * Get the stream of all child schemas.
+     * 
+     * @param <T>
+     * 
+     * @return stream of child schemas
+     */
+    public abstract <T extends JsonSchemaElement> Stream<T> getChildren();
 }

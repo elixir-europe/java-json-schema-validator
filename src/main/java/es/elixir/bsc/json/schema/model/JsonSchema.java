@@ -30,7 +30,6 @@ import es.elixir.bsc.json.schema.ValidationException;
 import java.util.List;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import jakarta.json.JsonValue;
-import java.net.URI;
 
 /**
  * @author Dmitry Repchevsky
@@ -46,11 +45,9 @@ public interface JsonSchema extends JsonSchemaElement {
     public final static String RECURSIVE_ANCHOR = "$recursiveAnchor";
     public final static String VOCABULARY = "$vocabulary";
     
-    URI getId();
+    void validate(JsonValue value, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) throws ValidationException;
 
-    boolean validate(JsonValue value, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) throws ValidationException;
-
-    default boolean validate(JsonValue value, List<ValidationError> errors) {
-        return validate(value, errors, null);
+    default void validate(JsonValue value, List<ValidationError> errors) {
+        validate(value, errors, null);
     }
 }

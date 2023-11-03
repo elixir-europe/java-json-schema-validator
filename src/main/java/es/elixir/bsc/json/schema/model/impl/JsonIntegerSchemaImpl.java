@@ -30,6 +30,8 @@ import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.model.JsonIntegerSchema;
+import static es.elixir.bsc.json.schema.model.NumericSchema.MAXIMUM;
+import static es.elixir.bsc.json.schema.model.NumericSchema.MINIMUM;
 import java.math.BigInteger;
 import java.util.List;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
@@ -49,7 +51,7 @@ import jakarta.json.JsonValue;
 public class JsonIntegerSchemaImpl extends NumericSchemaImpl<BigInteger>
                                    implements JsonIntegerSchema {
 
-    public JsonIntegerSchemaImpl(JsonSchemaImpl parent, JsonSchemaLocator locator,
+    public JsonIntegerSchemaImpl(AbstractJsonSchemaElement parent, JsonSchemaLocator locator,
             String jsonPointer) {
         super(parent, locator, jsonPointer);
     }

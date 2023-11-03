@@ -31,6 +31,7 @@ import es.elixir.bsc.json.schema.JsonSchemaReader;
 import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.model.JsonSchema;
+import es.elixir.bsc.json.schema.model.impl.AbstractJsonSchema;
 import jakarta.json.JsonException;
 import java.io.IOException;
 import java.net.URI;
@@ -46,7 +47,7 @@ import jakarta.json.JsonValue;
 
 public class DefaultJsonSchemaReader implements JsonSchemaReader {
     
-    private final Map<URI, JsonSchema> schemas;
+    private final Map<URI, AbstractJsonSchema> schemas;
     private final Map<String, Object> properties;
     
     public DefaultJsonSchemaReader() {
@@ -71,17 +72,17 @@ public class DefaultJsonSchemaReader implements JsonSchemaReader {
     
     @Override
     public JsonSchema read(JsonSchemaLocator locator) throws JsonSchemaException {
-        JsonSchema schema = schemas.get(locator.uri);
+        AbstractJsonSchema schema = schemas.get(locator.uri);
         if (schema == null) {
             final JsonValue obj;
             try {
                 obj = locator.getSchema("/");
             } catch (IOException ex) {
                 throw new JsonSchemaException(
-                        new ParsingError(ParsingMessage.UNRESOLVABLE_SCHEMA, new Object[] {locator.uri}));
+                        new ParsingError(ParsingMessage.UNRESOLVABLE_SCHEMA, locator.uri));
             } catch (JsonException ex) {
                 throw new JsonSchemaException(
-                        new ParsingError(ParsingMessage.JSON_PARSING_ERROR, new Object[] {ex.getMessage()}));
+                        new ParsingError(ParsingMessage.JSON_PARSING_ERROR, ex.getMessage()));
             }
             schema = new DefaultJsonSchemaParser(properties).parse(locator, obj);
             schemas.put(locator.uri, schema);

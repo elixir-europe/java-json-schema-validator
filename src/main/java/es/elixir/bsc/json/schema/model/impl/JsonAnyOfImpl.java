@@ -47,16 +47,16 @@ import jakarta.json.JsonValue;
  */
 
 public class JsonAnyOfImpl extends SchemaArrayImpl
-                           implements AbstractJsonSchema, JsonAnyOf<AbstractJsonSchema> {
+                           implements JsonAnyOf<AbstractJsonSchema> {
     
     private JsonArray types;
     
-    public JsonAnyOfImpl(JsonSchemaImpl parent, JsonSchemaLocator locator,
+    public JsonAnyOfImpl(AbstractJsonSchemaElement parent, JsonSchemaLocator locator,
             String jsonPointer) {
         super(parent, locator, jsonPointer);
     }
     
-    public JsonAnyOfImpl(JsonSchemaImpl parent, JsonSchemaLocator locator,
+    public JsonAnyOfImpl(AbstractJsonSchemaElement parent, JsonSchemaLocator locator,
             String jsonPointer, JsonArray types) {
         super(parent, locator, jsonPointer);
         
@@ -71,7 +71,7 @@ public class JsonAnyOfImpl extends SchemaArrayImpl
         if (types == null) {
             for (JsonType val : JsonType.values()) {
                 try {
-                    final AbstractJsonSchema s = parser.parse(getCurrentScope(), this, getJsonPointer(), value, val);
+                    final AbstractJsonSchema s = parser.parse(getScope(), this, getJsonPointer(), value, val);
                     if (s != null) {
                         add(s);
                     }
@@ -86,10 +86,10 @@ public class JsonAnyOfImpl extends SchemaArrayImpl
                 }
                 try {
                      final JsonType t = JsonType.fromValue(((JsonString)val).getString());
-                     add(parser.parse(getCurrentScope(), parent, getJsonPointer(), value, t));
+                     add(parser.parse(getScope(), parent, getJsonPointer(), value, t));
                 } catch(IllegalArgumentException ex) {
                     throw new JsonSchemaException(
-                        new ParsingError(ParsingMessage.UNKNOWN_OBJECT_TYPE, new Object[] {val}));
+                        new ParsingError(ParsingMessage.UNKNOWN_OBJECT_TYPE, val));
                 }
             }            
         }        

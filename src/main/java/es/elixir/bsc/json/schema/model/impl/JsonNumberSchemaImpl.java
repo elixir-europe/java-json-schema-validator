@@ -46,7 +46,7 @@ import jakarta.json.JsonValue;
 public class JsonNumberSchemaImpl extends NumericSchemaImpl<BigDecimal>
                                   implements JsonNumberSchema {
 
-    public JsonNumberSchemaImpl(JsonSchemaImpl parent, JsonSchemaLocator locator,
+    public JsonNumberSchemaImpl(AbstractJsonSchemaElement parent, JsonSchemaLocator locator,
             String jsonPointer) {
         super(parent, locator, jsonPointer);
     }
@@ -94,7 +94,7 @@ public class JsonNumberSchemaImpl extends NumericSchemaImpl<BigDecimal>
         
         return nerrors == errors.size();
     }
-
+    
     private void validate(String jsonPointer, BigDecimal dec, List<ValidationError> errors) {
 
         if (minimum != null) {

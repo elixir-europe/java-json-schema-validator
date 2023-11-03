@@ -38,10 +38,12 @@ import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonRecursiveReference;
 import es.elixir.bsc.json.schema.model.JsonReference;
 import es.elixir.bsc.json.schema.model.JsonSchema;
+import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.PrimitiveSchema;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.stream.Stream;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
@@ -53,7 +55,7 @@ import jakarta.json.JsonValue;
  * @author Dmitry Repchevsky
  */
 
-public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
+public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
         implements PrimitiveSchema<AbstractJsonSchema> {
 
     private JsonSchemaLocator scope;
@@ -79,13 +81,26 @@ public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
     
     private boolean recursiveAnchor;
     
-    public PrimitiveSchemaImpl(JsonSchemaImpl parent, JsonSchemaLocator locator, 
+    public PrimitiveSchemaImpl(AbstractJsonSchemaElement parent, JsonSchemaLocator locator, 
             String jsonPointer) {
         super(parent, locator, jsonPointer);
     }
 
     @Override
-    public JsonSchemaLocator getCurrentScope() {
+    public Stream<JsonSchemaElement> getChildren() {
+        return Stream.of(
+                allOf != null ? allOf.getChildren() : null,
+                anyOf != null ? anyOf.getChildren() : null,
+                oneOf != null ? oneOf.getChildren() : null,
+                not != null ? not.getChildren() : null,
+                _if != null ? _if.getChildren() : null,
+                _then != null ? _then.getChildren() : null,
+                _else != null ? _else.getChildren() : null)
+                .flatMap(c -> c);
+    }
+
+    @Override
+    public JsonSchemaLocator getScope() {
         return scope;
     }
     
@@ -155,8 +170,6 @@ public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
                                     final JsonObject object, 
                                     final JsonType type) throws JsonSchemaException {
 
-        super.read(parser, object, type);
-        
         JsonValue $id = object.get(JsonSchema.ID);
         if ($id == null) {
             $id = object.get("id"); // draft4

@@ -51,7 +51,7 @@ import es.elixir.bsc.json.schema.model.impl.AbstractJsonSchema;
 import es.elixir.bsc.json.schema.model.impl.BooleanJsonSchemaImpl;
 import es.elixir.bsc.json.schema.model.impl.JsonConstImpl;
 import es.elixir.bsc.json.schema.model.impl.JsonReferenceImpl;
-import es.elixir.bsc.json.schema.model.impl.JsonSchemaImpl;
+import es.elixir.bsc.json.schema.model.impl.AbstractJsonSchemaElement;
 import java.util.Map;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
@@ -75,9 +75,9 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
     public Map<String, Object> getJsonSchemaParserProperties() {
         return properties;
     }
-
+    
     @Override
-    public AbstractJsonSchema parse(JsonSchemaLocator locator, JsonSchemaImpl parent, 
+    public AbstractJsonSchema parse(JsonSchemaLocator locator, AbstractJsonSchemaElement parent, 
             String jsonPointer, JsonValue value, JsonType type) 
             throws JsonSchemaException {
 
@@ -126,7 +126,6 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
                             ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
                             new Object[] {"type", type_value.getValueType().name(), 
                                           "either a string or an array"}));
-
             }
         }
         

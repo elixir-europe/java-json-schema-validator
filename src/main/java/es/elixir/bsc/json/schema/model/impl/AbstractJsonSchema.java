@@ -26,6 +26,7 @@
 package es.elixir.bsc.json.schema.model.impl;
 
 import es.elixir.bsc.json.schema.JsonSchemaException;
+import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationException;
@@ -45,20 +46,28 @@ import jakarta.json.JsonValue;
  * @param <T> the Json type accepted by the reader to parse this schema element.
  */
 
-public interface AbstractJsonSchema<T extends JsonValue> extends JsonSchema {
+public abstract class AbstractJsonSchema<T extends JsonValue> 
+        extends AbstractJsonSchemaElement implements JsonSchema {
     
-    boolean validate(String jsonPointer, JsonValue value, JsonValue parent, 
-            List evaluated, List<ValidationError> errors, 
-            JsonSchemaValidationCallback<JsonValue> callback) 
+    public AbstractJsonSchema(AbstractJsonSchemaElement parent, JsonSchemaLocator locator, 
+            String jsonPointer) {
+        super(parent, locator, jsonPointer);
+    }
+    
+    public AbstractJsonSchema<T> read(JsonSubschemaParser parser, T value,
+            JsonType type) throws JsonSchemaException {
+        return this;
+    }
+    
+    public abstract boolean validate(String jsonPointer, JsonValue value, JsonValue parent, 
+            List evaluated, List<ValidationError> errors,
+            JsonSchemaValidationCallback<JsonValue> callback)
             throws ValidationException;
 
     @Override
-    default boolean validate(JsonValue value, List<ValidationError> errors, 
+    public void validate(JsonValue value, List<ValidationError> errors, 
             JsonSchemaValidationCallback<JsonValue> callback) 
             throws ValidationException {
-        return validate("", value, null, new ArrayList(), errors, callback);
+        validate("", value, null, new ArrayList(), errors, callback);
     }
-    
-    AbstractJsonSchema<T> read(JsonSubschemaParser parser, T value, JsonType type) 
-            throws JsonSchemaException;
 }

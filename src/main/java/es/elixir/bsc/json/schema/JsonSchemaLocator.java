@@ -78,6 +78,8 @@ public abstract class JsonSchemaLocator {
             throws IOException, JsonException;
 
     /**
+     * Create a new locator derived from this one.
+     * 
      * @param uri the URI to be resolved in a context of this locator.
      * @return new locator that is able to return Json Schema.
      */
