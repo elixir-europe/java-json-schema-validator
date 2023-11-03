@@ -33,8 +33,8 @@ import java.util.Map;
  * @param <T>
  */
 
-public interface JsonProperties<T extends JsonSchema> extends 
-        Iterable<Map.Entry<String, T>> {
+public interface JsonProperties<T extends JsonSchema> 
+        extends Iterable<Map.Entry<String, T>> {
     
     boolean contains(String name);
     T get(String name);

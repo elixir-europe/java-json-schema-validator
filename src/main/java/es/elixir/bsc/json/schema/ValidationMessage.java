@@ -55,7 +55,7 @@ public enum ValidationMessage {
     
     OBJECT_ALL_OF_CONSTRAINT_MSG(OBJECT_ALL_OF_CONSTRAINT, "object allOf constraint failed"),
     OBJECT_ANY_OF_CONSTRAINT_MSG(OBJECT_ANY_OF_CONSTRAINT, "object anyOf constraint failed"),
-    OBJECT_ONE_OF_CONSTRAINT_MSG(OBJECT_ONE_OF_CONSTRAINT, "object oneOf constraint failed: %s"),
+    OBJECT_ONE_OF_CONSTRAINT_MSG(OBJECT_ONE_OF_CONSTRAINT, "object oneOf constraint failed"),
     OBJECT_NOT_CONSTRAINT_MSG(OBJECT_NOT_CONSTRAINT, "object not constraint failed"),
 
     NUMBER_NOT_INTEGER_MSG(NUMBER_NOT_INTEGER, "number %s is not an integer"),

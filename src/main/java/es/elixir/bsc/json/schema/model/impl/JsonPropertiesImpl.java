@@ -29,10 +29,12 @@ import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonProperties;
+import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Stream;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 
@@ -40,44 +42,57 @@ import javax.json.JsonValue;
  * @author Dmitry Repchevsky
  */
 
-public class JsonPropertiesImpl extends LinkedHashMap<String, AbstractJsonSchema>
+public class JsonPropertiesImpl extends AbstractJsonSchemaElement
                                 implements JsonProperties<AbstractJsonSchema> {
 
+    private final Map<String, AbstractJsonSchema> properties;
+    
+    public JsonPropertiesImpl(AbstractJsonSchema parent, JsonSchemaLocator locator,
+            String jsonPointer) {
+        super(parent, locator, jsonPointer);
+        properties = new LinkedHashMap();
+    }
+
+    @Override
+    public <T extends JsonSchemaElement> Stream<T> getChildren() {
+        final Stream stream = Stream.of(
+                properties.values().stream(),
+                properties.values().stream().flatMap(JsonSchemaElement::getChildren));
+        
+        return stream.flatMap(c -> c);
+    }
 
     @Override
     public boolean contains(String name) {
-        return super.containsKey(name);
+        return properties.containsKey(name);
     }
     
     @Override
     public AbstractJsonSchema get(String name) {
-        return super.get(name);
+        return properties.get(name);
     }
 
     @Override
     public AbstractJsonSchema put(String name, AbstractJsonSchema schema) {
-        return super.put(name, schema);
+        return properties.put(name, schema);
     }
     
     @Override
     public AbstractJsonSchema remove(String name) {
-        return super.remove(name);
+        return properties.remove(name);
     }
     
     @Override
     public Iterator<Entry<String, AbstractJsonSchema>> iterator() {
-        return entrySet().iterator();
+        return properties.entrySet().iterator();
     }
     
-    public JsonPropertiesImpl read(final JsonSubschemaParser parser, 
-                                   final JsonSchemaLocator locator, 
-                                   final JsonSchemaImpl parent,
-                                   final String jsonPointer,
-                                   final JsonObject object) throws JsonSchemaException {
+    public JsonPropertiesImpl read(JsonSubschemaParser parser,
+            JsonObject object) throws JsonSchemaException {
 
         for (Map.Entry<String, JsonValue> entry : object.entrySet()) {
             final JsonValue value = entry.getValue();
-            final AbstractJsonSchema schema = parser.parse(locator, parent, jsonPointer + "/" + entry.getKey(), value, null);
+            final AbstractJsonSchema schema = parser.parse(locator, this, getJsonPointer() + "/" + entry.getKey(), value, null);
             put(entry.getKey(), schema);
         }
         

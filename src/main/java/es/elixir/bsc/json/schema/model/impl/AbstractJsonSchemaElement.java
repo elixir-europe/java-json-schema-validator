@@ -25,27 +25,21 @@
 
 package es.elixir.bsc.json.schema.model.impl;
 
-import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
-import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
-import es.elixir.bsc.json.schema.model.JsonType;
-import javax.json.JsonValue;
+import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import java.net.URI;
 
 /**
  * @author Dmitry Repchevsky
- * 
- * @param <T> the type of the Json Schema (either 'JsonObject' or 'JsonValue' for TRUE/FALSE)
  */
 
-public abstract class JsonSchemaImpl<T extends JsonValue> implements AbstractJsonSchema<T> {
+public abstract class AbstractJsonSchemaElement implements JsonSchemaElement {
     
-    public final JsonSchemaImpl parent;
+    public final AbstractJsonSchemaElement parent;
     public final JsonSchemaLocator locator;
-    
     private final String jsonPointer;
 
-    public JsonSchemaImpl(JsonSchemaImpl parent, JsonSchemaLocator locator, 
+    public AbstractJsonSchemaElement(AbstractJsonSchemaElement parent, JsonSchemaLocator locator, 
             String jsonPointer) {
 
         this.parent = parent;
@@ -54,30 +48,22 @@ public abstract class JsonSchemaImpl<T extends JsonValue> implements AbstractJso
     }
 
     @Override
-    public URI getId() {
-        return getCurrentScope().uri;
-    }
-
-    @Override
-    public JsonSchemaImpl getParent() {
-        return parent;
+    public final URI getId() {
+        return getScope().uri;
     }
 
     @Override
     public String getJsonPointer() {
         // when scope != locator (new scope) jsonPointer is 'root'
-        return getCurrentScope() == locator ? jsonPointer : "/";
-    }
-
-    public JsonSchemaLocator getCurrentScope() {
-        return locator;
+        return getScope() == locator ? jsonPointer : "/";
     }
 
     @Override
-    public JsonSchemaImpl<T> read(final JsonSubschemaParser parser,
-                                  final T value,
-                                  final JsonType type) throws JsonSchemaException {
+    public AbstractJsonSchemaElement getParent() {
+        return parent;
+    }
 
-        return this;
+    public JsonSchemaLocator getScope() {
+        return locator;
     }
 }

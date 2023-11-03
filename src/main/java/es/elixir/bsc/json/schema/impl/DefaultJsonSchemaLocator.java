@@ -131,7 +131,7 @@ public class DefaultJsonSchemaLocator extends JsonSchemaLocator {
 
     @Override
     public JsonSchemaLocator resolve(URI uri) {
-        // fix wrong (?) uri.resove() where base uri is opeque and child has no schema
+        // fix wrong (?) uri.resove() where base uri is opaque and child has no schema
         if (super.uri.isOpaque() && uri.getSchemeSpecificPart().isEmpty() && uri.getFragment() != null) {
             try {
                 return new DefaultJsonSchemaLocator(new URI(super.uri.getScheme(), 

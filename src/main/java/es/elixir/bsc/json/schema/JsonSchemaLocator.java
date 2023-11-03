@@ -25,6 +25,7 @@
 
 package es.elixir.bsc.json.schema;
 
+import es.elixir.bsc.json.schema.model.JsonSchema;
 import java.io.IOException;
 import java.net.URI;
 import javax.json.JsonException;
@@ -78,8 +79,19 @@ public abstract class JsonSchemaLocator {
             throws IOException, JsonException;
 
     /**
+     * Create a new locator derived from this one.
+     * 
      * @param uri the URI to be resolved in a context of this locator.
      * @return new locator that is able to return Json Schema.
      */
     public abstract JsonSchemaLocator resolve(URI uri);
+    
+    /**
+     * Callback method that is 
+     * There are cases were the location URI doesn't resolve the schema, but
+     * is used as an identifier ('id' or '$id").
+     * 
+     * @param schema the schema to associate with this locator (URI).
+     */
+    protected void setSchema(JsonSchema schema) {}
 }

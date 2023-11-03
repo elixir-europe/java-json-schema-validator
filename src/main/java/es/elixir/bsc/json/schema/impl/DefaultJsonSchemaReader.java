@@ -31,6 +31,7 @@ import es.elixir.bsc.json.schema.JsonSchemaReader;
 import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.model.JsonSchema;
+import es.elixir.bsc.json.schema.model.impl.AbstractJsonSchema;
 import javax.json.JsonException;
 import java.io.IOException;
 import java.net.URI;
@@ -46,7 +47,7 @@ import javax.json.JsonValue;
 
 public class DefaultJsonSchemaReader implements JsonSchemaReader {
     
-    private final Map<URI, JsonSchema> schemas;
+    private final Map<URI, AbstractJsonSchema> schemas;
     private final Map<String, Object> properties;
     
     public DefaultJsonSchemaReader() {
@@ -71,7 +72,7 @@ public class DefaultJsonSchemaReader implements JsonSchemaReader {
     
     @Override
     public JsonSchema read(JsonSchemaLocator locator) throws JsonSchemaException {
-        JsonSchema schema = schemas.get(locator.uri);
+        AbstractJsonSchema schema = schemas.get(locator.uri);
         if (schema == null) {
             final JsonValue obj;
             try {

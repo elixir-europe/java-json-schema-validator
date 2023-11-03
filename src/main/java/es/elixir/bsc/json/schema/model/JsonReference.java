@@ -35,5 +35,5 @@ public interface JsonReference extends JsonSchema {
     
     public final static String REF = "$ref";
     
-    <T extends JsonSchema> T getSchema() throws JsonSchemaException;
+    <T extends JsonSchemaElement> T getSchema() throws JsonSchemaException;
 }

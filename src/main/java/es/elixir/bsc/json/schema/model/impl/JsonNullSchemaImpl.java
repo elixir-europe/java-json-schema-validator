@@ -44,7 +44,7 @@ import javax.json.JsonValue;
 public class JsonNullSchemaImpl extends PrimitiveSchemaImpl
                                 implements JsonNullSchema {
 
-    public JsonNullSchemaImpl(JsonSchemaImpl parent, JsonSchemaLocator locator,
+    public JsonNullSchemaImpl(AbstractJsonSchemaElement parent, JsonSchemaLocator locator,
             String jsonPointer) {
         super(parent, locator, jsonPointer);
     }

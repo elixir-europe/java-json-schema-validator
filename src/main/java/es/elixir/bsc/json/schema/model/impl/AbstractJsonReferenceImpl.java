@@ -39,10 +39,10 @@ import javax.json.JsonValue;
  * @author Dmitry Repchevsky
  */
 
-public abstract class AbstractJsonReferenceImpl extends JsonSchemaImpl<JsonObject> 
+public abstract class AbstractJsonReferenceImpl extends AbstractJsonSchema<JsonObject>
         implements JsonReference {
 
-    public AbstractJsonReferenceImpl(JsonSchemaImpl parent, JsonSchemaLocator locator,
+    public AbstractJsonReferenceImpl(AbstractJsonSchemaElement parent, JsonSchemaLocator locator,
             String jsonPointer) {
         super(parent, locator, jsonPointer);
     }

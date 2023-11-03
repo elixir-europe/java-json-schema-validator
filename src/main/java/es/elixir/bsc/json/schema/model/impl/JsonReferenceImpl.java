@@ -31,10 +31,12 @@ import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonReference;
+import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import es.elixir.bsc.json.schema.model.JsonType;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.stream.Stream;
 import javax.json.JsonException;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
@@ -45,20 +47,41 @@ import javax.json.JsonValue;
 
 public class JsonReferenceImpl extends AbstractJsonReferenceImpl implements JsonReference {
 
-    private AbstractJsonSchema schema;
+    private JsonSchemaElement schema;
 
     private String ref;
     private String ref_pointer;
     private JsonSchemaLocator ref_locator;
     private JsonSubschemaParser parser;
     
-    public JsonReferenceImpl(JsonSchemaImpl parent, JsonSchemaLocator locator,
+    public JsonReferenceImpl(AbstractJsonSchemaElement parent, JsonSchemaLocator locator,
             String jsonPointer) {
         super(parent, locator, jsonPointer);
     }
 
     @Override
-    public AbstractJsonSchema getSchema() throws JsonSchemaException {
+    public <T extends JsonSchemaElement> Stream<T> getChildren() {
+        if (schema == null) {
+            JsonSchemaElement s = getParent();
+            while (s != null) {
+                if (ref_locator.uri.equals(s.getId()) &&
+                    ref_pointer.equals(s.getJsonPointer())) {
+                    return Stream.of(); // cyclic ref
+                }
+                s = s.getParent();
+            }
+            try {
+                schema = getSchema();
+            } catch(JsonSchemaException ex) {
+                return Stream.of(); // unresolvable ref
+            }
+        }
+        
+        return schema.getChildren();
+    }
+
+    @Override
+    public JsonSchemaElement getSchema() throws JsonSchemaException {
         if (schema == null) {
             try {
                 JsonValue jsubschema = ref_locator.getSchema(ref_pointer);
@@ -85,27 +108,27 @@ public class JsonReferenceImpl extends AbstractJsonReferenceImpl implements Json
 
         this.parser = parser;
 
-        final String ref = object.getString(REF);
+        ref = object.getString(REF);
         try {
             final URI uri = URI.create(ref);
             final String fragment = uri.getFragment();
             if (fragment == null) {
-                ref_pointer = "";
-                ref_locator = getCurrentScope().resolve(uri);
+                ref_pointer = "/";
+                ref_locator = getScope().resolve(uri);
             } else if ("#".equals(ref)) {
-                ref_pointer = "";
-                ref_locator = getCurrentScope();
-            } else if (fragment.startsWith("/")){
+                ref_pointer = "/";
+                ref_locator = getScope();
+            } else if (fragment.startsWith("/")) {
                 ref_pointer = fragment;
                 if (ref.startsWith("#")) {
-                    ref_locator = getCurrentScope();
+                    ref_locator = getScope();
                 } else {
-                    ref_locator = getCurrentScope().resolve(
+                    ref_locator = getScope().resolve(
                         new URI(uri.getScheme(), uri.getSchemeSpecificPart(), null));                        
                 }
             } else {
-                ref_pointer = "";
-                ref_locator = getCurrentScope().resolve(uri);
+                ref_pointer = "/";
+                ref_locator = getScope().resolve(uri);
             }
         } catch(JsonException | IllegalArgumentException | URISyntaxException ex) {
             throw new JsonSchemaException(

@@ -31,8 +31,10 @@ import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonRecursiveReference;
+import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.PrimitiveSchema;
+import java.util.stream.Stream;
 import javax.json.JsonObject;
 import javax.json.JsonString;
 import javax.json.JsonValue;
@@ -44,28 +46,33 @@ import javax.json.JsonValue;
 public class JsonRecursiveReferenceImpl extends AbstractJsonReferenceImpl
         implements JsonRecursiveReference {
 
-    private AbstractJsonSchema schema;
+    private JsonSchemaElement schema;
     
-    public JsonRecursiveReferenceImpl(JsonSchemaImpl parent, JsonSchemaLocator locator,
+    public JsonRecursiveReferenceImpl(AbstractJsonSchemaElement parent, JsonSchemaLocator locator,
             String jsonPointer) {
         super(parent, locator, jsonPointer);
     }
 
     @Override
-    public AbstractJsonSchema getSchema() throws JsonSchemaException {
+    public <T extends JsonSchemaElement> Stream<T> getChildren() {
+        return Stream.of(); // TODO
+    }
+
+    @Override
+    public JsonSchemaElement getSchema() throws JsonSchemaException {
         if (schema == null) {
-            JsonSchemaImpl s = this;
-            while ((s = s.parent) != null) {
-                if ("/".equals(s.getJsonPointer())) {
+            AbstractJsonSchemaElement s = this;
+            while ((s = s.getParent()) != null) {
+                if ("/".equals(s.getJsonPointer()) && s instanceof PrimitiveSchema) {
                     final boolean isRecursiveAnchor = ((PrimitiveSchema)s).isRecursiveAnchor();
-                    
+
                     // no 'type' or 'type': [] leads to AnyOf[] surrogate wrapper.
                     // because we are in a 'root' parent either has different location
                     // or be the wrapper.
                     if (s.parent != null && s.locator == s.parent.locator) {
                         s = s.parent;
                     }
-                    
+
                     if (isRecursiveAnchor) {
                         schema = s;
                         continue;
@@ -76,6 +83,7 @@ public class JsonRecursiveReferenceImpl extends AbstractJsonReferenceImpl
                 }
             }
         }
+        
         return schema;
     }
 

@@ -43,9 +43,9 @@ import javax.json.JsonValue;
  */
 
 public class JsonOneOfImpl extends SchemaArrayImpl
-                           implements AbstractJsonSchema, JsonOneOf<AbstractJsonSchema> {
+                           implements JsonOneOf<AbstractJsonSchema> {
 
-    public JsonOneOfImpl(JsonSchemaImpl parent, JsonSchemaLocator locator,
+    public JsonOneOfImpl(AbstractJsonSchema parent, JsonSchemaLocator locator,
             String jsonPointer) {
         super(parent, locator, jsonPointer);
     }

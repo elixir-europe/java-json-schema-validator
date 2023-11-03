@@ -55,7 +55,7 @@ public class JsonStringSchemaImpl extends PrimitiveSchemaImpl
     private String format;
     private Pattern pattern;
 
-    public JsonStringSchemaImpl(JsonSchemaImpl parent, JsonSchemaLocator locator,
+    public JsonStringSchemaImpl(AbstractJsonSchemaElement parent, JsonSchemaLocator locator,
             String jsonPointer) {
         super(parent, locator, jsonPointer);
     }
@@ -153,7 +153,7 @@ public class JsonStringSchemaImpl extends PrimitiveSchemaImpl
         
         return nerrors == errors.size();
     }
-    
+
     private void validate(String jsonPointer, String string, List<ValidationError> errors) {
         
         if (minLength != null && string.codePointCount(0, string.length()) < minLength) {

@@ -31,8 +31,10 @@ import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.SchemaArray;
 import java.util.HashSet;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
+import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.stream.Stream;
 import javax.json.JsonArray;
 import javax.json.JsonValue;
 
@@ -40,16 +42,24 @@ import javax.json.JsonValue;
  * @author Dmitry Repchevsky
  */
 
-public abstract class SchemaArrayImpl extends JsonSchemaImpl
+public abstract class SchemaArrayImpl extends AbstractJsonSchema
         implements SchemaArray<AbstractJsonSchema> {
     
     private final Set<AbstractJsonSchema> schemas;
     
-    public SchemaArrayImpl(JsonSchemaImpl parent, JsonSchemaLocator locator,
+    public SchemaArrayImpl(AbstractJsonSchemaElement parent, JsonSchemaLocator locator,
             String jsonPointer) {
         super(parent, locator, jsonPointer);
 
         schemas = new HashSet();
+    }
+
+    @Override
+    public Stream<JsonSchemaElement> getChildren() {
+        final Stream stream = Stream.of(
+                schemas.stream(),
+                schemas.stream().flatMap(JsonSchemaElement::getChildren));
+        return stream.flatMap(c -> c);
     }
 
     @Override
@@ -78,7 +88,7 @@ public abstract class SchemaArrayImpl extends JsonSchemaImpl
 
         for (int i = 0, n = array.size(); i < n; i++) {
             final JsonValue value = array.get(i);
-            final AbstractJsonSchema schema = parser.parse(getCurrentScope(), this, 
+            final AbstractJsonSchema schema = parser.parse(getScope(), this, 
                     getJsonPointer() + "/" + Integer.toString(i), value, type);
             add(schema);
         }
