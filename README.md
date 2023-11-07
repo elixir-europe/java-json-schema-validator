@@ -29,25 +29,30 @@ to resolve "$ref" Json Pointers.
 
 To provide flexibility it is possible to get callbacks during the validation process.
 ```java
-schema.validate(json, errors, (PrimitiveSchema subschema, JsonValue value, JsonValue parent, List<ValidationError> err) -> {
+schema.validate(json, errors, (
+    PrimitiveSchema subschema, String pointer, JsonValue value, JsonValue parent, List<ValidationError> err) -> {
 });
 ```
 Here above we have:
 - subschema - current validating Json (sub)schema
-- value - current validating Json value
-- err - collected validation errors so far.
+- pointer - Json Pointer to the validating Json value
+- value - currently validating Json value
+- parent - a parent of currently validating Json value
+- err - collected validation errors so far
 
 Note, that providing ExtendedJsonSchemaLocator (which collects all subschemas as originated jsons), we can
 associate validated JsonValue with corresponding Json Object which describes the schema:
 ```java
 JsonSchema schema = JsonSchemaReader.getReader().read(locator);
-schema.validate(json, errors, (PrimitiveSchema subschema, JsonValue value, JsonValue parent, List<ValidationError> err) -> {
-    JsonObject subschemaJsonObject = locator.getSchemas(subschema.getId()).get(subschema.getJsonPointer());
+schema.validate(json, errors, (
+    PrimitiveSchema subschema, String pointer, JsonValue value, JsonValue parent, List<ValidationError> err) -> {
+        JsonObject subschemaJsonObject = locator.getSchema(subschema.getId(), subschema.getJsonPointer());
 });
 ```
 We can also stop further parsing on error via the callback:
 ```java
-schema.validate(json, errors, (PrimitiveSchema subschema, JsonValue value, JsonValue parent, List<ValidationError> err) -> {
-    throw new ValidationException(new ValidationError(subschema.getId(), subschema.getJsonPointer(), ""));
+schema.validate(json, errors, (
+    PrimitiveSchema subschema, String pointer, JsonValue value, JsonValue parent, List<ValidationError> err) -> {
+        throw new ValidationException(new ValidationError(subschema.getId(), subschema.getJsonPointer(), ""));
 });
 ```
