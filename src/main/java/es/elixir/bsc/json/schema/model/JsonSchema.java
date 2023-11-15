@@ -45,9 +45,9 @@ public interface JsonSchema extends JsonSchemaElement {
     public final static String RECURSIVE_ANCHOR = "$recursiveAnchor";
     public final static String VOCABULARY = "$vocabulary";
     
-    void validate(JsonValue value, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) throws ValidationException;
+    boolean validate(JsonValue value, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) throws ValidationException;
 
-    default void validate(JsonValue value, List<ValidationError> errors) {
-        validate(value, errors, null);
+    default boolean validate(JsonValue value, List<ValidationError> errors) {
+        return validate(value, errors, null);
     }
 }

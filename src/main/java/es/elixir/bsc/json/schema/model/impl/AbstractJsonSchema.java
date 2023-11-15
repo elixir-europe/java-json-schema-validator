@@ -65,9 +65,9 @@ public abstract class AbstractJsonSchema<T extends JsonValue>
             throws ValidationException;
 
     @Override
-    public void validate(JsonValue value, List<ValidationError> errors, 
+    public boolean validate(JsonValue value, List<ValidationError> errors, 
             JsonSchemaValidationCallback<JsonValue> callback) 
             throws ValidationException {
-        validate("", value, null, new ArrayList(), errors, callback);
+        return validate("", value, null, new ArrayList(), errors, callback);
     }
 }
