@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -86,7 +86,7 @@ public class JsonConstImpl extends PrimitiveSchemaImpl implements JsonConst {
         
         return super.validate(jsonPointer, value, parent, evaluated, errors, callback);
     }
-    
+
     protected static boolean equals(JsonValue v1, JsonValue v2) {
         if (v1.getValueType() != v2.getValueType()) {
             return false;
@@ -94,6 +94,15 @@ public class JsonConstImpl extends PrimitiveSchemaImpl implements JsonConst {
 
         switch(v1.getValueType()) {
             case NUMBER: return ((JsonNumber)v1).doubleValue() == ((JsonNumber)v2).doubleValue();
+            case ARRAY: if (v1.asJsonArray().size() != v2.asJsonArray().size()) {
+                            return false;
+                        }
+                        for (int i = 0, n = v1.asJsonArray().size(); i < n; i++) {
+                            if (!equals(v1.asJsonArray().get(i), v2.asJsonArray().get(i))) {
+                                return false;
+                            }
+                        }
+                        return true;
         }
 
         return v1.equals(v2);

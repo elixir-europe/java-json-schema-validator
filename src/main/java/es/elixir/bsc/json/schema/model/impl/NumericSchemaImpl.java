@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -32,7 +32,6 @@ import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.NumericSchema;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import java.math.BigDecimal;
 import jakarta.json.JsonNumber;
 import jakarta.json.JsonObject;
@@ -151,7 +150,7 @@ public abstract class NumericSchemaImpl<T extends Number> extends PrimitiveSchem
                 case TRUE:   isExclusiveMinimum = true;
                 case FALSE:  break;
                 default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                                 new Object[] {EXCLUSIVE_MINIMUM, jexclusiveMinimum.getValueType().name(), "either number or boolean (draft4)"}));
+                                 EXCLUSIVE_MINIMUM, jexclusiveMinimum.getValueType().name(), "either number or boolean (draft4)"));
             }
         }
         
@@ -163,7 +162,7 @@ public abstract class NumericSchemaImpl<T extends Number> extends PrimitiveSchem
                 case TRUE:   isExclusiveMaximum = true;
                 case FALSE:  break;
                 default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                                 new Object[] {EXCLUSIVE_MAXIMUM, jexclusiveMaximum.getValueType().name(), "either number or boolean (draft4)"}));
+                                    EXCLUSIVE_MAXIMUM, jexclusiveMaximum.getValueType().name(), "either number or boolean (draft4)"));
             }
         }
 

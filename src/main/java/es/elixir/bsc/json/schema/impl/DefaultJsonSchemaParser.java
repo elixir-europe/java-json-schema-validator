@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -33,7 +33,6 @@ import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
 import static es.elixir.bsc.json.schema.model.JsonEnum.ENUM;
 import es.elixir.bsc.json.schema.model.JsonType;
-import es.elixir.bsc.json.schema.model.impl.JsonAnyOfImpl;
 import es.elixir.bsc.json.schema.model.impl.JsonArraySchemaImpl;
 import es.elixir.bsc.json.schema.model.impl.JsonBooleanSchemaImpl;
 import es.elixir.bsc.json.schema.model.impl.JsonEnumImpl;
@@ -52,6 +51,7 @@ import es.elixir.bsc.json.schema.model.impl.BooleanJsonSchemaImpl;
 import es.elixir.bsc.json.schema.model.impl.JsonConstImpl;
 import es.elixir.bsc.json.schema.model.impl.JsonReferenceImpl;
 import es.elixir.bsc.json.schema.model.impl.AbstractJsonSchemaElement;
+import es.elixir.bsc.json.schema.model.impl.JsonMultitypeSchemaWrapper;
 import java.util.Map;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
@@ -87,8 +87,8 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
         }
 
         if (value.getValueType() != ValueType.OBJECT) {
-                throw new JsonSchemaException(new ParsingError(ParsingMessage.SCHEMA_OBJECT_ERROR, 
-                   new Object[] {value.getValueType()}));
+                throw new JsonSchemaException(new ParsingError(
+                        ParsingMessage.SCHEMA_OBJECT_ERROR, value.getValueType()));
         }
 
         final JsonObject object = value.asJsonObject();
@@ -97,7 +97,7 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
         if (jref != null) {
             if (JsonValue.ValueType.STRING != jref.getValueType()) {
                 throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                       new Object[] {JsonReference.REF, jref.getValueType().name(), JsonValue.ValueType.STRING.name()}));
+                        JsonReference.REF, jref.getValueType().name(), JsonValue.ValueType.STRING.name()));
             }
             
             // before draft 2019-09 $ref ignored any other properties
@@ -110,22 +110,22 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
         final ValueType vtype;
         if (type_value == null) {
             vtype = null;
-        } else {
+            } else {
             vtype = type_value.getValueType();
             switch(vtype) {
                 case STRING: 
-                    try {
+            try {
                         type = JsonType.fromValue(((JsonString)type_value).getString());
-                    } catch(IllegalArgumentException ex) {
-                        throw new JsonSchemaException(new ParsingError(ParsingMessage.UNKNOWN_OBJECT_TYPE, 
-                            new Object[] {((JsonString)type_value).getString()}));
-                    }
+            } catch(IllegalArgumentException ex) {
+                throw new JsonSchemaException(new ParsingError(
+                        ParsingMessage.UNKNOWN_OBJECT_TYPE, ((JsonString)type_value).getString()));
+            }
                 case ARRAY: break;
-                default: 
+                default:
                     throw new JsonSchemaException(new ParsingError(
-                            ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                            new Object[] {"type", type_value.getValueType().name(), 
-                                          "either a string or an array"}));
+                            ParsingMessage.INVALID_ATTRIBUTE_TYPE,
+                            "type", type_value.getValueType().name(),
+                            "either a string or an array"));
             }
         }
         
@@ -143,7 +143,8 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
         }
 
         if (type == null) {
-            return new JsonAnyOfImpl(parent, locator, jsonPointer, vtype == ValueType.ARRAY ? type_value.asJsonArray() : null)
+            return new JsonMultitypeSchemaWrapper(parent, locator, jsonPointer, 
+                    vtype == ValueType.ARRAY ? type_value.asJsonArray() : null)
                     .read(this, object, null);
         }
 

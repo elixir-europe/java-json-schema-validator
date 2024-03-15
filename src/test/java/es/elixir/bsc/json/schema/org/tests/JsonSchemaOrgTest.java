@@ -97,7 +97,8 @@ public class JsonSchemaOrgTest {
                     JsonValue sch = obj.get("schema");
                     DefaultJsonSchemaLocator locator = new DefaultJsonSchemaLocator(uri.resolve(Integer.toString(j)));
                     locator.setSchema(sch);
-                    JsonSchema schema = JsonSchemaReader.getReader(config).read(locator);
+                    JsonSchemaReader reader = JsonSchemaReader.getReader(config);
+                    JsonSchema schema = reader.read(locator);
                     JsonArray tests = obj.getJsonArray("tests");
                     for (int i = 0; i < tests.size(); i++) {
                         JsonObject test = tests.getJsonObject(i);
@@ -140,7 +141,7 @@ public class JsonSchemaOrgTest {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             final URI uri = exchange.getRequestURI();
-            try (InputStream in = JsonSchemaOrgTest.class.getClassLoader().getResourceAsStream("test/remotes/" + uri.getPath())) {
+            try (InputStream in = JsonSchemaOrgTest.class.getClassLoader().getResourceAsStream("json-schema-org/remotes/" + uri.getPath())) {
                 if (in != null) {
                     final byte[] file = in.readAllBytes();
                     exchange.sendResponseHeaders(200, file.length);
@@ -150,6 +151,8 @@ public class JsonSchemaOrgTest {
                 }
             } catch (IOException ex) {
                 exchange.sendResponseHeaders(500, 0);
+            } finally {
+                exchange.close();
             }
         }        
 

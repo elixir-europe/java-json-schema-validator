@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -93,7 +93,7 @@ public class JsonDependentPropertiesImpl extends AbstractJsonSchemaElement
             final JsonValue value = entry.getValue();            
             if (JsonValue.ValueType.ARRAY != value.getValueType()) {
                 throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_OBJECT_TYPE, 
-                    new Object[] {name + " dependentRequired schema ", value.getValueType().name(), JsonValue.ValueType.ARRAY.name()}));
+                    name + " dependentRequired schema ", value.getValueType().name(), JsonValue.ValueType.ARRAY.name()));
 
             }
             

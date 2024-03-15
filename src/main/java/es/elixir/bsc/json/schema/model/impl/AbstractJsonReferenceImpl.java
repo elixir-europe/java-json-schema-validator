@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -28,12 +28,20 @@ package es.elixir.bsc.json.schema.model.impl;
 import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
+import es.elixir.bsc.json.schema.ParsingError;
+import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationException;
+import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonReference;
+import es.elixir.bsc.json.schema.model.JsonSchemaElement;
+import es.elixir.bsc.json.schema.model.JsonType;
+import jakarta.json.JsonException;
 import java.util.List;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * @author Dmitry Repchevsky
@@ -42,11 +50,51 @@ import jakarta.json.JsonValue;
 public abstract class AbstractJsonReferenceImpl extends AbstractJsonSchema<JsonObject>
         implements JsonReference {
 
+    protected JsonSchemaElement schema;
+
+    protected URI ref;
+    protected String ref_pointer;
+    protected JsonSchemaLocator ref_locator;
+    protected JsonSubschemaParser parser;
+    
     public AbstractJsonReferenceImpl(AbstractJsonSchemaElement parent, JsonSchemaLocator locator,
             String jsonPointer) {
         super(parent, locator, jsonPointer);
     }
     
+    protected void read(JsonSubschemaParser parser, JsonObject object, 
+            JsonType type, String tag) throws JsonSchemaException {
+
+        this.parser = parser;
+        
+        final String jref = object.getString(tag);
+        try {
+            ref = URI.create(jref);
+            final String fragment = ref.getFragment();
+            if (fragment == null) {
+                ref_pointer = "/";
+                ref_locator = getScope().resolve(ref);
+            } else if ("#".equals(jref)) {
+                ref_pointer = "/";
+                ref_locator = getScope();
+            } else if (fragment.startsWith("/")) {
+                ref_pointer = fragment;
+                if (jref.startsWith("#")) {
+                    ref_locator = getScope();
+                } else {
+                    ref_locator = getScope().resolve(
+                        new URI(ref.getScheme(), ref.getSchemeSpecificPart(), null));                        
+                }
+            } else {
+                ref_pointer = "/";
+                ref_locator = getScope().resolve(ref);
+            }
+        } catch(JsonException | IllegalArgumentException | URISyntaxException ex) {
+            throw new JsonSchemaException(
+                    new ParsingError(ParsingMessage.INVALID_REFERENCE, ref));
+        }
+    }
+
     @Override
     public boolean validate(String jsonPointer, JsonValue value, JsonValue parent, 
             List evaluated, List<ValidationError> errors, 

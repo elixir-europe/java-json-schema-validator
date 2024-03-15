@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -36,7 +36,9 @@ public class JsonSchemaNotTest extends JsonSchemaOrgTest {
     private final static String JSON_DRAFT4_TEST_FILE = "json-schema-org/tests/draft4/not.json";
     private final static String JSON_DRAFT6_TEST_FILE = "json-schema-org/tests/draft6/not.json";
     private final static String JSON_DRAFT7_TEST_FILE = "json-schema-org/tests/draft7/not.json";
-    
+    private final static String JSON_DRAFT201909_TEST_FILE = "json-schema-org/tests/draft2019-09/not.json";
+    private final static String JSON_DRAFT202012_TEST_FILE = "json-schema-org/tests/draft2020-12/not.json";
+
     @Test
     public void test_draft4() {
         test(JSON_DRAFT4_TEST_FILE);
@@ -50,5 +52,15 @@ public class JsonSchemaNotTest extends JsonSchemaOrgTest {
     @Test
     public void test_draft7() {
         test(JSON_DRAFT7_TEST_FILE);
+    }
+    
+    @Test
+    public void test_draft201909() {
+        test(JSON_DRAFT201909_TEST_FILE);
+    }
+    
+    @Test
+    public void test_draft202012() {
+        test(JSON_DRAFT202012_TEST_FILE);
     }
 }

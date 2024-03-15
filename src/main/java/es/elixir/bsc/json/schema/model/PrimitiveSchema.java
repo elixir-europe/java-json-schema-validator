@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -60,12 +60,4 @@ public interface PrimitiveSchema<T extends JsonSchema> extends JsonSchema {
     <T extends JsonSchema> T getElse();
     
     JsonReference getReference();
-    
-    /**
-     * $RecursiveAnchor property
-     * @see https://json-schema.org/draft/2019-09/json-schema-core.html#recursive-ref
-     * 
-     * @return TRUE when "recursiveAnchor": true
-     */
-    boolean isRecursiveAnchor();
 }

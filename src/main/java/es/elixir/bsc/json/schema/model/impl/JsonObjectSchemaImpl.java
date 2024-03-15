@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -41,7 +41,6 @@ import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonDependentProperties;
-import es.elixir.bsc.json.schema.model.JsonSchema;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -55,9 +54,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import jakarta.json.JsonNumber;
-import static jakarta.json.JsonValue.ValueType.FALSE;
-import static jakarta.json.JsonValue.ValueType.OBJECT;
-import static jakarta.json.JsonValue.ValueType.TRUE;
 
 /**
  * @author Dmitry Repchevsky
@@ -173,44 +169,6 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
                                      final JsonType type) throws JsonSchemaException {
         
         super.read(parser, object, type);
-
-        JsonValue jdefs = object.get(JsonSchema.DEFS);
-        if (jdefs != null) {
-            if (JsonValue.ValueType.OBJECT != jdefs.getValueType()) {
-                throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                       new Object[] {JsonSchema.DEFS, jdefs.getValueType().name(), JsonValue.ValueType.OBJECT.name()}));
-            }
-            for (Map.Entry<String, JsonValue> entry : jdefs.asJsonObject().entrySet()) {
-                final JsonValue subschema = entry.getValue();
-                switch(subschema.getValueType()) {
-                    case OBJECT:
-                    case TRUE: 
-                    case FALSE:  parser.parse(getScope(), parent, getJsonPointer() + "/" + JsonSchema.DEFS + "/" + entry.getKey(), subschema, null);
-                                 break;
-                    default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                                     new Object[] {entry.getKey(), subschema.getValueType().name(), JsonValue.ValueType.OBJECT.name()}));
-                }
-            }
-        }
-
-        JsonValue jdefinitions = object.get("definitions");
-        if (jdefinitions != null) {
-            if (JsonValue.ValueType.OBJECT != jdefinitions.getValueType()) {
-                throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                       new Object[] {"definitions", jdefinitions.getValueType().name(), JsonValue.ValueType.OBJECT.name()}));
-            }
-            for (Map.Entry<String, JsonValue> entry : jdefinitions.asJsonObject().entrySet()) {
-                final JsonValue subschema = entry.getValue();
-                switch(subschema.getValueType()) {
-                    case OBJECT:
-                    case TRUE:
-                    case FALSE:  parser.parse(getScope(), this, getJsonPointer() + "/definitions/" + entry.getKey(), subschema, null);
-                                 break;
-                    default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                                    new Object[] {entry.getKey(), subschema.getValueType().name(), JsonValue.ValueType.OBJECT.name()}));
-                }
-            }
-        }
         
         final JsonObject jproperties = JsonSchemaUtil.check(object.get(PROPERTIES), ValueType.OBJECT);
         if (jproperties != null) {
@@ -246,7 +204,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
                 case TRUE:   additionalProperties = true; break;
                 case FALSE:  additionalProperties = false; break;
                 default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                                   new Object[] {ADDITIONAL_PROPERTIES, jadditionalProperties.getValueType().name(), "either object or boolean"}));
+                                    ADDITIONAL_PROPERTIES, jadditionalProperties.getValueType().name(), "either object or boolean"));
             }
         }
         
@@ -257,7 +215,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
                 case TRUE:   unevaluatedProperties = true; break;
                 case FALSE:  unevaluatedProperties = false; break;
                 default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                                   new Object[] {UNEVALUATED_PROPERTIES, junevaluatedProperties.getValueType().name(), "either object or boolean"}));
+                                    UNEVALUATED_PROPERTIES, junevaluatedProperties.getValueType().name(), "either object or boolean"));
             }
         }
 
@@ -270,7 +228,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
                 case FALSE:  propertyNames = new BooleanJsonSchemaImpl(this, getScope(), getJsonPointer() + "/" + PROPERTY_NAMES).read(parser, jpropertyNames, null);
                              break;
                 default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                                   new Object[] {PROPERTY_NAMES, jpropertyNames.getValueType().name(), "either object or boolean"}));
+                                    PROPERTY_NAMES, jpropertyNames.getValueType().name(), "either object or boolean"));
             }
         }
         
@@ -302,8 +260,8 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
                                  getDependentRequired().put(name, arr);
                                  break;
                     default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_OBJECT_TYPE, 
-                                   new Object[] {name + " dependentRequired schema ", 
-                                       value.getValueType().name(), JsonValue.ValueType.OBJECT.name() + " or " + JsonValue.ValueType.ARRAY.name()}));
+                                    name + " dependentRequired schema ", value.getValueType().name(), 
+                                    JsonValue.ValueType.OBJECT.name() + " or " + JsonValue.ValueType.ARRAY.name()));
                 }
             }
         }
