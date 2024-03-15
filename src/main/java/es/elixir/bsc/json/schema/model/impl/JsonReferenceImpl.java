@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -34,8 +34,6 @@ import es.elixir.bsc.json.schema.model.JsonReference;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import es.elixir.bsc.json.schema.model.JsonType;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.stream.Stream;
 import javax.json.JsonException;
 import javax.json.JsonObject;
@@ -46,13 +44,6 @@ import javax.json.JsonValue;
  */
 
 public class JsonReferenceImpl extends AbstractJsonReferenceImpl implements JsonReference {
-
-    private JsonSchemaElement schema;
-
-    private String ref;
-    private String ref_pointer;
-    private JsonSchemaLocator ref_locator;
-    private JsonSubschemaParser parser;
     
     public JsonReferenceImpl(AbstractJsonSchemaElement parent, JsonSchemaLocator locator,
             String jsonPointer) {
@@ -103,38 +94,8 @@ public class JsonReferenceImpl extends AbstractJsonReferenceImpl implements Json
     public JsonReferenceImpl read(final JsonSubschemaParser parser,
                                   final JsonObject object, 
                                   final JsonType type) throws JsonSchemaException {
-
-        super.read(parser, object, type);
-
-        this.parser = parser;
-
-        ref = object.getString(REF);
-        try {
-            final URI uri = URI.create(ref);
-            final String fragment = uri.getFragment();
-            if (fragment == null) {
-                ref_pointer = "/";
-                ref_locator = getScope().resolve(uri);
-            } else if ("#".equals(ref)) {
-                ref_pointer = "/";
-                ref_locator = getScope();
-            } else if (fragment.startsWith("/")) {
-                ref_pointer = fragment;
-                if (ref.startsWith("#")) {
-                    ref_locator = getScope();
-                } else {
-                    ref_locator = getScope().resolve(
-                        new URI(uri.getScheme(), uri.getSchemeSpecificPart(), null));                        
-                }
-            } else {
-                ref_pointer = "/";
-                ref_locator = getScope().resolve(uri);
-            }
-        } catch(JsonException | IllegalArgumentException | URISyntaxException ex) {
-            throw new JsonSchemaException(
-                    new ParsingError(ParsingMessage.INVALID_REFERENCE, ref));
-        }
         
+        super.read(parser, object, type, REF);
         return this;
     }
 }

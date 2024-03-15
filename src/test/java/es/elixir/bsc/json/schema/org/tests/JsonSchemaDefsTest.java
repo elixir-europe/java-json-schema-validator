@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -34,9 +34,15 @@ import org.junit.Test;
 public class JsonSchemaDefsTest extends JsonSchemaOrgTest {
 
     private final static String JSON_DRAFT201909_TEST_FILE = "json-schema-org/tests/draft2019-09/defs.json";
+    private final static String JSON_DRAFT202012_TEST_FILE = "json-schema-org/tests/draft2020-12/defs.json";
     
     @Test
     public void test_draft201909() {
-        //test(JSON_DRAFT201909_TEST_FILE);
+        test(JSON_DRAFT201909_TEST_FILE);
+    }
+    
+    @Test
+    public void test_draft202012() {
+        test(JSON_DRAFT202012_TEST_FILE);
     }
 }

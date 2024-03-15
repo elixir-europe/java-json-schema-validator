@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -33,66 +33,30 @@ import es.elixir.bsc.json.schema.model.JsonAnyOf;
 import java.util.ArrayList;
 import java.util.List;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
-import es.elixir.bsc.json.schema.ParsingError;
-import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.ValidationException;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonType;
-import javax.json.JsonArray;
-import javax.json.JsonString;
 import javax.json.JsonValue;
 
 /**
  * @author Dmitry Repchevsky
+ * 
+ * @param <T>
  */
 
-public class JsonAnyOfImpl extends SchemaArrayImpl
+public class JsonAnyOfImpl<T extends JsonValue> extends SchemaArrayImpl<T>
                            implements JsonAnyOf<AbstractJsonSchema> {
-    
-    private JsonArray types;
     
     public JsonAnyOfImpl(AbstractJsonSchemaElement parent, JsonSchemaLocator locator,
             String jsonPointer) {
         super(parent, locator, jsonPointer);
     }
     
-    public JsonAnyOfImpl(AbstractJsonSchemaElement parent, JsonSchemaLocator locator,
-            String jsonPointer, JsonArray types) {
-        super(parent, locator, jsonPointer);
-        
-        this.types = types;
-    }
-    
     @Override
     public JsonAnyOfImpl read(final JsonSubschemaParser parser,
-                              final JsonValue value,
+                              final T value,
                               final JsonType type) throws JsonSchemaException {
-        
-        if (types == null) {
-            for (JsonType val : JsonType.values()) {
-                try {
-                    final AbstractJsonSchema s = parser.parse(getScope(), this, getJsonPointer(), value, val);
-                    if (s != null) {
-                        add(s);
-                    }
-                } catch(JsonSchemaException ex) {
-                    // do nothing
-                }
-            }
-        } else {
-            for (JsonValue val : types) {
-                if (JsonValue.ValueType.STRING != val.getValueType()) {
-                    
-                }
-                try {
-                     final JsonType t = JsonType.fromValue(((JsonString)val).getString());
-                     add(parser.parse(getScope(), parent, getJsonPointer(), value, t));
-                } catch(IllegalArgumentException ex) {
-                    throw new JsonSchemaException(
-                        new ParsingError(ParsingMessage.UNKNOWN_OBJECT_TYPE, val));
-                }
-            }            
-        }        
+        super.read(parser, value, type);
         return this;
     }
 

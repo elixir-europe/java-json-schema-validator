@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -43,6 +43,7 @@ public interface JsonSchema extends JsonSchemaElement {
     public final static String DEFS = "$defs";
     public final static String ANCHOR = "$anchor";
     public final static String RECURSIVE_ANCHOR = "$recursiveAnchor";
+    public final static String DYNAMIC_ANCHOR = "$dynamicAnchor";
     public final static String VOCABULARY = "$vocabulary";
     
     boolean validate(JsonValue value, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) throws ValidationException;

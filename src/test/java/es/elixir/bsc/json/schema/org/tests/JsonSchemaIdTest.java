@@ -36,7 +36,9 @@ public class JsonSchemaIdTest extends JsonSchemaOrgTest {
     private final static String JSON_DRAFT4_TEST_FILE = "json-schema-org/tests/draft4/id.json";
     private final static String JSON_DRAFT6_TEST_FILE = "json-schema-org/tests/draft6/id.json";
     private final static String JSON_DRAFT7_TEST_FILE = "json-schema-org/tests/draft7/id.json";
-    
+    private final static String JSON_DRAFT201909_TEST_FILE = "json-schema-org/tests/draft2019-09/id.json";
+    private final static String JSON_DRAFT202012_TEST_FILE = "json-schema-org/tests/draft2020-12/id.json";
+
     @Test
     public void test_draft4() {
         test(JSON_DRAFT4_TEST_FILE);
@@ -51,4 +53,14 @@ public class JsonSchemaIdTest extends JsonSchemaOrgTest {
     public void test_draft7() {
         test(JSON_DRAFT7_TEST_FILE);
     }
+    
+    @Test
+    public void test_draft201909() {
+        test(JSON_DRAFT201909_TEST_FILE);
+    }
+    
+//    @Test
+//    public void test_draft202012() {
+//        test(JSON_DRAFT202012_TEST_FILE);
+//    }
 }

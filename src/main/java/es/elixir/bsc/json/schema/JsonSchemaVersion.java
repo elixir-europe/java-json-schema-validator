@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -35,7 +35,8 @@ public enum JsonSchemaVersion {
     SCHEMA_DRAFT_04("http://json-schema.org/draft-04/schema#"),
     SCHEMA_DRAFT_06("http://json-schema.org/draft-06/schema#"),
     SCHEMA_DRAFT_07("http://json-schema.org/draft-07/schema#"),
-    SCHEMA_DRAFT_2019_09("https://json-schema.org/draft/2019-09/schema");
+    SCHEMA_DRAFT_2019_09("https://json-schema.org/draft/2019-09/schema"),
+    SCHEMA_DRAFT_2020_12("https://json-schema.org/draft/2020-12/schema");
     
     public final String VALUE;
     

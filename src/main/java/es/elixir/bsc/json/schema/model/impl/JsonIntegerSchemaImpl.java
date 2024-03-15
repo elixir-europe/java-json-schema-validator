@@ -109,7 +109,7 @@ public class JsonIntegerSchemaImpl extends NumericSchemaImpl<BigInteger>
         
         return nerrors == errors.size();
     }
-
+    
     public void validate(String jsonPointer, BigInteger num, List<ValidationError> errors) {
         if (minimum != null) {
             if (isExclusiveMinimum != null && isExclusiveMinimum) {

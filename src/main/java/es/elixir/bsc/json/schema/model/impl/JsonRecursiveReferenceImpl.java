@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -33,11 +33,11 @@ import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonRecursiveReference;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import es.elixir.bsc.json.schema.model.JsonType;
-import es.elixir.bsc.json.schema.model.PrimitiveSchema;
 import java.util.stream.Stream;
 import javax.json.JsonObject;
 import javax.json.JsonString;
 import javax.json.JsonValue;
+import java.io.IOException;
 
 /**
  * @author Dmitry Repchevsky
@@ -45,8 +45,6 @@ import javax.json.JsonValue;
 
 public class JsonRecursiveReferenceImpl extends AbstractJsonReferenceImpl
         implements JsonRecursiveReference {
-
-    private JsonSchemaElement schema;
     
     public JsonRecursiveReferenceImpl(AbstractJsonSchemaElement parent, JsonSchemaLocator locator,
             String jsonPointer) {
@@ -61,32 +59,37 @@ public class JsonRecursiveReferenceImpl extends AbstractJsonReferenceImpl
     @Override
     public JsonSchemaElement getSchema() throws JsonSchemaException {
         if (schema == null) {
-            AbstractJsonSchemaElement s = this;
-            while ((s = s.getParent()) != null) {
-                if ("/".equals(s.getJsonPointer()) && s instanceof PrimitiveSchema) {
-                    final boolean isRecursiveAnchor = ((PrimitiveSchema)s).isRecursiveAnchor();
+            AbstractJsonSchemaElement e = this;
+            try {
+                while ((e = e.getParent()) != null) {
+                    if ("/".equals(e.getJsonPointer())) {
+                        final JsonSchemaLocator scope = e.getScope();
+                        final JsonValue value = scope.getSchema("/");
+                        if (value instanceof JsonObject jsubschema) {
+                            final boolean anchor = jsubschema.getBoolean(RECURSIVE_ANCHOR, false);
 
-                    // no 'type' or 'type': [] leads to AnyOf[] surrogate wrapper.
-                    // because we are in a 'root' parent either has different location
-                    // or be the wrapper.
-                    if (s.parent != null && s.locator == s.parent.locator) {
-                        s = s.parent;
-                    }
+                            // no 'type' or 'type': [] leads to JsonMultitypeSchemaWrapper wrapper.
+                            // because we are in a 'root' parent either has different location
+                            // or be the wrapper.
+                            if (e.parent instanceof JsonMultitypeSchemaWrapper) {
+                                e = e.parent;
+                            }
 
-                    if (isRecursiveAnchor) {
-                        schema = s;
-                        continue;
-                    } else if (schema == null) {
-                        schema = s;
+                            if (anchor) {
+                                schema = e;
+                                continue;
+                            } else if (schema == null) {
+                                schema = e;
+                            }
+                            break;
+                        }
                     }
-                    break;
                 }
-            }
+            } catch (IOException ex) {}
         }
         
         return schema;
     }
-
     @Override
     public JsonRecursiveReferenceImpl read(final JsonSubschemaParser parser,
                                            final JsonObject object, 

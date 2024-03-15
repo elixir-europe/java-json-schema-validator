@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -49,7 +49,7 @@ public interface JsonSchemaUtil {
     static <U extends JsonValue> U require(JsonValue value, JsonValue.ValueType type) throws JsonSchemaException {
         if (value.getValueType() != type) {
             throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                new Object[] {"type", value.getValueType().name(), "either a string or an array"}));
+                    "type", value.getValueType().name(), "either a string or an array"));
         }
         return (U)value;
     }    

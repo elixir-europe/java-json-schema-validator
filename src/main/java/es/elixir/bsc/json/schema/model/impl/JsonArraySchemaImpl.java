@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -37,6 +37,7 @@ import es.elixir.bsc.json.schema.model.JsonType;
 import java.util.ArrayList;
 import java.util.List;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
+import static es.elixir.bsc.json.schema.model.JsonArraySchema.ADDITIONAL_ITEMS;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import java.util.HashSet;
 import java.util.Set;
@@ -169,7 +170,7 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
                 case TRUE: uniqueItems = true; break;
                 case FALSE: uniqueItems = false; break;
                 default: throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                                       new Object[] {UNIQUE_ITEMS, juniqueItems.getValueType().name(), "must be boolean"}));
+                                       UNIQUE_ITEMS, juniqueItems.getValueType().name(), "must be boolean"));
             }
         }
 
@@ -206,12 +207,12 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
                                                 getItems().add(arr);
                                                 break;
                                     default: throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                                                 new Object[] {ITEMS + "/" + i, value.getValueType().name(), "either an object or boolean"}));
+                                                 ITEMS + "/" + i, value.getValueType().name(), "either an object or boolean"));
                                 }
                             }
                             break;
                 default: throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                         new Object[] {ITEMS, jitems.getValueType().name(), "either an object, boolean or an array"}));
+                                ITEMS, jitems.getValueType().name(), "either an object, boolean or an array"));
 
             }
         }
@@ -224,7 +225,7 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
                     case FALSE:  additionalItems = false;
                     case TRUE:   break;
                     default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                                       new Object[] {ADDITIONAL_ITEMS, jadditionalItems.getValueType().name(), "either object or boolean"}));
+                                            ADDITIONAL_ITEMS, jadditionalItems.getValueType().name(), "either object or boolean"));
                 }
                 additionalItemsSchema = parser.parse(getScope(), this, getJsonPointer() + "/" + ADDITIONAL_ITEMS, jadditionalItems, null);
             }
@@ -239,7 +240,7 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
                 case TRUE:   unevaluatedItems = true; break;
                 case FALSE:  unevaluatedItems = false; break;
                 default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                                   new Object[] {UNEVALUATED_ITEMS, junevaluatedItems.getValueType().name(), "either object or boolean"}));
+                                    UNEVALUATED_ITEMS, junevaluatedItems.getValueType().name(), "either object or boolean"));
             }
         }
 

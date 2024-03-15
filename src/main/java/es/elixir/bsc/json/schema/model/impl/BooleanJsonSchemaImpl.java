@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -68,8 +68,8 @@ public class BooleanJsonSchemaImpl extends AbstractJsonSchema<JsonValue>
 
         if (schema.getValueType() != ValueType.TRUE &&
             schema.getValueType() != ValueType.FALSE) {
-            throw new JsonSchemaException(new ParsingError(ParsingMessage.SCHEMA_OBJECT_ERROR, 
-                   new Object[] {schema.getValueType()}));
+            throw new JsonSchemaException(new ParsingError(
+                    ParsingMessage.SCHEMA_OBJECT_ERROR, schema.getValueType()));
         }
         
         evaluation = schema.getValueType() == ValueType.TRUE;

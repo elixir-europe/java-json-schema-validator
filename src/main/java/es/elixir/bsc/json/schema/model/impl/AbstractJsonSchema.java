@@ -60,14 +60,14 @@ public abstract class AbstractJsonSchema<T extends JsonValue>
     }
     
     public abstract boolean validate(String jsonPointer, JsonValue value, JsonValue parent, 
-            List evaluated, List<ValidationError> errors,
-            JsonSchemaValidationCallback<JsonValue> callback)
+            List evaluated, List<ValidationError> errors, 
+            JsonSchemaValidationCallback<JsonValue> callback) 
             throws ValidationException;
 
     @Override
     public boolean validate(JsonValue value, List<ValidationError> errors, 
             JsonSchemaValidationCallback<JsonValue> callback) 
             throws ValidationException {
-        return validate("", value, null, new ArrayList(), errors, callback);
+        return validate("/", value, null, new ArrayList(), errors, callback);
     }
 }

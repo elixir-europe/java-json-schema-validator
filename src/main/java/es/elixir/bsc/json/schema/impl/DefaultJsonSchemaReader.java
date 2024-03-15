@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -65,8 +65,8 @@ public class DefaultJsonSchemaReader implements JsonSchemaReader {
         try {
             return read(new DefaultJsonSchemaLocator(url.toURI()));
         } catch (URISyntaxException ex) {
-            throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_REFERENCE,
-                                          new Object[] {url.toString()}));
+            throw new JsonSchemaException(
+                    new ParsingError(ParsingMessage.INVALID_REFERENCE, url.toString()));
         }
     }
     

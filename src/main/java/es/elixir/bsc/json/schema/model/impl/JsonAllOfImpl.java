@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -42,7 +42,7 @@ import javax.json.JsonArray;
  * @author Dmitry Repchevsky
  */
 
-public class JsonAllOfImpl extends SchemaArrayImpl
+public class JsonAllOfImpl extends SchemaArrayImpl<JsonValue>
         implements JsonAllOf<AbstractJsonSchema> {
 
     public JsonAllOfImpl(AbstractJsonSchema parent, JsonSchemaLocator locator,
