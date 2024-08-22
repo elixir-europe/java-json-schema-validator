@@ -29,7 +29,6 @@ import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
-import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.NumericSchema;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import java.math.BigDecimal;
@@ -131,11 +130,10 @@ public abstract class NumericSchemaImpl<T extends Number> extends PrimitiveSchem
     }
     
     @Override
-    public NumericSchemaImpl read(final JsonSubschemaParser parser,
-                                  final JsonObject object, 
-                                  final JsonType type) throws JsonSchemaException {
+    public NumericSchemaImpl read(JsonSubschemaParser parser, JsonObject object)
+            throws JsonSchemaException {
 
-        super.read(parser, object, type);
+        super.read(parser, object);
         
         final JsonNumber mul = JsonSchemaUtil.check(object.getJsonNumber(MULTIPLE_OF), JsonValue.ValueType.NUMBER);
         if (mul != null) {

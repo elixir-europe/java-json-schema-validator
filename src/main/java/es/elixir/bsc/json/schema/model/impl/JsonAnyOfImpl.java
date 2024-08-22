@@ -35,7 +35,6 @@ import java.util.List;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.ValidationException;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
-import es.elixir.bsc.json.schema.model.JsonType;
 import javax.json.JsonValue;
 
 /**
@@ -53,10 +52,10 @@ public class JsonAnyOfImpl<T extends JsonValue> extends SchemaArrayImpl<T>
     }
     
     @Override
-    public JsonAnyOfImpl read(final JsonSubschemaParser parser,
-                              final T value,
-                              final JsonType type) throws JsonSchemaException {
-        super.read(parser, value, type);
+    public JsonAnyOfImpl read(JsonSubschemaParser parser, T value)
+            throws JsonSchemaException {
+
+        super.read(parser, value);
         return this;
     }
 

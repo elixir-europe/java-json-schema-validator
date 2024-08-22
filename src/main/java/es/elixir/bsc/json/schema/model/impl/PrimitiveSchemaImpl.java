@@ -40,7 +40,6 @@ import es.elixir.bsc.json.schema.model.JsonRecursiveReference;
 import es.elixir.bsc.json.schema.model.JsonReference;
 import es.elixir.bsc.json.schema.model.JsonSchema;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
-import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.PrimitiveSchema;
 import java.net.URI;
 import java.util.ArrayList;
@@ -95,7 +94,8 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
                 not != null ? not.getChildren() : null,
                 _if != null ? _if.getChildren() : null,
                 _then != null ? _then.getChildren() : null,
-                _else != null ? _else.getChildren() : null)
+                _else != null ? _else.getChildren() : null,
+                ref != null ? ref.getChildren() : null)
                 .flatMap(c -> c);
     }
 
@@ -161,9 +161,8 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
     }
     
     @Override
-    public PrimitiveSchemaImpl read(final JsonSubschemaParser parser,
-                                    final JsonObject object, 
-                                    final JsonType type) throws JsonSchemaException {
+    public PrimitiveSchemaImpl read(JsonSubschemaParser parser, JsonObject object)
+            throws JsonSchemaException {
 
         JsonValue $id = object.get(JsonSchema.ID);
         if ($id == null) {
@@ -248,7 +247,7 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
         final JsonArray jallOf = JsonSchemaUtil.check(object.get(ALL_OF), JsonValue.ValueType.ARRAY);
         if (jallOf != null) {
             final JsonAllOfImpl _allOf = new JsonAllOfImpl(this, scope, getJsonPointer() + "/" + ALL_OF)
-                    .read(parser, jallOf, type);
+                    .read(parser, jallOf);
             if (allOf == null) {
                 allOf = _allOf;
             } else {
@@ -261,13 +260,13 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
         final JsonArray janyOf = JsonSchemaUtil.check(object.get(ANY_OF), JsonValue.ValueType.ARRAY);
         if (janyOf != null) {
             anyOf = new JsonAnyOfImpl(this, scope, getJsonPointer() + "/" + ANY_OF);
-            anyOf.read(parser, janyOf, type);
+            anyOf.read(parser, janyOf);
         }
         
         final JsonArray joneOf = JsonSchemaUtil.check(object.get(ONE_OF), JsonValue.ValueType.ARRAY);
         if (joneOf != null) {
             oneOf = new JsonOneOfImpl(this, scope, getJsonPointer() + "/" + ONE_OF);
-            oneOf.read(parser, joneOf, type);
+            oneOf.read(parser, joneOf);
         }
 
         final JsonValue jnot = object.get(NOT);
@@ -276,7 +275,7 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
                 case OBJECT:
                 case TRUE:
                 case FALSE: not = new JsonNotImpl(this, scope, getJsonPointer() + "/" + NOT)
-                                        .read(parser, jnot, null);
+                                        .read(parser, jnot);
                             break;
                 default: throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
                                        NOT, jnot.getValueType().name(), "either object or boolean"));
@@ -289,7 +288,7 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
                 case OBJECT: _if = parser.parse(scope, this, getJsonPointer() + "/" + IF, jif, null);
                              break;
                 case TRUE:
-                case FALSE:  _if = new BooleanJsonSchemaImpl(this, scope, getJsonPointer()).read(parser, jif, null);
+                case FALSE:  _if = new BooleanJsonSchemaImpl(this, scope, getJsonPointer()).read(parser, jif);
                              break;
                 default: throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
                                             IF, jif.getValueType().name(), "either object or boolean"));
@@ -302,7 +301,7 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
                 case OBJECT: _else = parser.parse(scope, this, getJsonPointer() + "/" + ELSE, jelse, null);
                              break;
                 case TRUE:
-                case FALSE:  _else = new BooleanJsonSchemaImpl(this, scope, getJsonPointer()).read(parser, jelse, null);
+                case FALSE:  _else = new BooleanJsonSchemaImpl(this, scope, getJsonPointer()).read(parser, jelse);
                              break;
                 default: throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
                                         ELSE, jelse.getValueType().name(), "either object or boolean"));
@@ -315,7 +314,7 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
                 case OBJECT: _then = parser.parse(scope, this, getJsonPointer() + "/" + THEN, jthen, null);
                              break;
                 case TRUE:
-                case FALSE:  _then = new BooleanJsonSchemaImpl(this, scope, getJsonPointer()).read(parser, jthen, null);
+                case FALSE:  _then = new BooleanJsonSchemaImpl(this, scope, getJsonPointer()).read(parser, jthen);
                              break;
                 default: throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
                                        THEN, jthen.getValueType().name(), "either object or boolean"));                             
@@ -324,13 +323,13 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
         
         final JsonValue jref = object.get(JsonReference.REF);
         if (jref != null && JsonSchemaVersion.SCHEMA_DRAFT_2019_09.compareTo(
-                parser.getJsonSchemaVersion(object)) <= 0) {
+                parser.getJsonSchemaVersion(locator)) <= 0) {
             if (JsonValue.ValueType.STRING != jref.getValueType()) {
                 throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
                        JsonReference.REF, jref.getValueType().name(), JsonValue.ValueType.STRING.name()));
             }
 
-            ref = new JsonReferenceImpl(this, scope, getJsonPointer()).read(parser, object, null);
+            ref = new JsonReferenceImpl(this, scope, getJsonPointer()).read(parser, object);
         }
 
         final JsonValue jdynamic_ref = object.get(JsonDynamicReference.DYNAMIC_REF);
@@ -345,7 +344,7 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
                 throw new JsonSchemaException(new ParsingError(ParsingMessage.INCOMPATIBLE_KEYWORDS, 
                             String.join(",", List.of(JsonRecursiveReference.REF, JsonDynamicReference.DYNAMIC_REF))));
             }
-            ref = new JsonDynamicReferenceImpl(this, scope, getJsonPointer()).read(parser, object, null);
+            ref = new JsonDynamicReferenceImpl(this, scope, getJsonPointer()).read(parser, object);
         }
 
         final JsonValue jrecursive_ref = object.get(JsonRecursiveReference.RECURSIVE_REF);
@@ -361,7 +360,7 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
                         String.join(",", List.of(JsonRecursiveReference.REF, JsonRecursiveReference.RECURSIVE_REF))));
             }
             
-            ref = new JsonRecursiveReferenceImpl(this, scope, getJsonPointer()).read(parser, object, null);
+            ref = new JsonRecursiveReferenceImpl(this, scope, getJsonPointer()).read(parser, object);
         }
         
         return this;

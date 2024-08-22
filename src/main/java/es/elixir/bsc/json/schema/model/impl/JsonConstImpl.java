@@ -32,7 +32,6 @@ import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonConst;
-import es.elixir.bsc.json.schema.model.JsonType;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 import java.util.List;
@@ -62,11 +61,10 @@ public class JsonConstImpl extends PrimitiveSchemaImpl implements JsonConst {
     }
     
     @Override
-    public JsonConstImpl read(final JsonSubschemaParser parser,
-                              final JsonObject object,
-                              final JsonType type) throws JsonSchemaException {
+    public JsonConstImpl read(JsonSubschemaParser parser, JsonObject object)
+            throws JsonSchemaException {
 
-        super.read(parser, object, type);
+        super.read(parser, object);
         
         value = object.get(CONST);
         
@@ -86,7 +84,7 @@ public class JsonConstImpl extends PrimitiveSchemaImpl implements JsonConst {
         
         return super.validate(jsonPointer, value, parent, evaluated, errors, callback);
     }
-
+    
     protected static boolean equals(JsonValue v1, JsonValue v2) {
         if (v1.getValueType() != v2.getValueType()) {
             return false;

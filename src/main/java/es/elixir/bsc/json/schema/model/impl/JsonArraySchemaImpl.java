@@ -33,7 +33,6 @@ import es.elixir.bsc.json.schema.model.JsonArraySchema;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
-import es.elixir.bsc.json.schema.model.JsonType;
 import java.util.ArrayList;
 import java.util.List;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
@@ -148,11 +147,10 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
     }
     
     @Override
-    public JsonArraySchemaImpl read(final JsonSubschemaParser parser,
-                                    final JsonObject object,
-                                    final JsonType type) throws JsonSchemaException {
+    public JsonArraySchemaImpl read(JsonSubschemaParser parser, JsonObject object)
+            throws JsonSchemaException {
 
-        super.read(parser, object, type);
+        super.read(parser, object);
         
         final JsonNumber min = JsonSchemaUtil.check(object.getJsonNumber(MIN_ITEMS), JsonValue.ValueType.NUMBER);
         if (min != null) {

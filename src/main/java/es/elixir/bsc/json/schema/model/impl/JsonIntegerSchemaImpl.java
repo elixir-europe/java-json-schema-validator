@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -35,7 +35,6 @@ import static es.elixir.bsc.json.schema.model.NumericSchema.MINIMUM;
 import java.math.BigInteger;
 import java.util.List;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
-import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import java.math.BigDecimal;
 import javax.json.JsonNumber;
@@ -57,11 +56,10 @@ public class JsonIntegerSchemaImpl extends NumericSchemaImpl<BigInteger>
     }
 
     @Override
-    public JsonIntegerSchemaImpl read(final JsonSubschemaParser parser,
-                                      final JsonObject object,
-                                      final JsonType type) throws JsonSchemaException {
+    public JsonIntegerSchemaImpl read(JsonSubschemaParser parser, JsonObject object)
+            throws JsonSchemaException {
         
-        super.read(parser, object, type);
+        super.read(parser, object);
 
         final JsonNumber min = JsonSchemaUtil.check(object.getJsonNumber(MINIMUM), JsonValue.ValueType.NUMBER);
         if (min != null) {

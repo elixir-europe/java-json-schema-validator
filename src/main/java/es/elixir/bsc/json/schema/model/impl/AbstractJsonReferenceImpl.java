@@ -35,7 +35,6 @@ import es.elixir.bsc.json.schema.ValidationException;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonReference;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
-import es.elixir.bsc.json.schema.model.JsonType;
 import javax.json.JsonException;
 import java.util.List;
 import javax.json.JsonObject;
@@ -62,8 +61,8 @@ public abstract class AbstractJsonReferenceImpl extends AbstractJsonSchema<JsonO
         super(parent, locator, jsonPointer);
     }
     
-    protected void read(JsonSubschemaParser parser, JsonObject object, 
-            JsonType type, String tag) throws JsonSchemaException {
+    protected void read(JsonSubschemaParser parser, JsonObject object, String tag)
+            throws JsonSchemaException {
 
         this.parser = parser;
         

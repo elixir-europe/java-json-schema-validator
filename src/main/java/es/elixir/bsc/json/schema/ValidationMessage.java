@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -97,7 +97,7 @@ public enum ValidationMessage {
     public final int CODE;
     public final String VALUE;
     
-    private ValidationMessage(final int code, final String value) {
+    private ValidationMessage(int code, String value) {
         CODE = code;
         VALUE = value;
     }

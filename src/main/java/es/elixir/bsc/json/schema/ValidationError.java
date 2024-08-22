@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -39,16 +39,15 @@ public class ValidationError {
     public final String path;
     public final String message;
     
-    public ValidationError(final String message) {
+    public ValidationError(String message) {
         this(null, null, null, message);
     }
     
-    public ValidationError(final URI id, final String pointer, final String message) {
+    public ValidationError(URI id, String pointer, String message) {
         this(id, pointer, null, message);
     }
 
-    public ValidationError(final URI id, final String pointer, 
-            final String path, final String message) {
+    public ValidationError(URI id, String pointer, String path, String message) {
         
         this.code = -1;
         this.id = id;
@@ -57,8 +56,8 @@ public class ValidationError {
         this.message = message;
     }
     
-    public ValidationError(final URI id, final String pointer, 
-            final String path, final ValidationMessage message, Object... args) {
+    public ValidationError(URI id, String pointer, String path, 
+            ValidationMessage message, Object... args) {
         
         this.code = message.CODE;
         this.id = id;

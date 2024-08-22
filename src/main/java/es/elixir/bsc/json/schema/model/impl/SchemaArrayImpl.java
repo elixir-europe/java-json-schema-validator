@@ -27,7 +27,6 @@ package es.elixir.bsc.json.schema.model.impl;
 
 import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
-import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.SchemaArray;
 import java.util.HashSet;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
@@ -85,14 +84,13 @@ public abstract class SchemaArrayImpl<T extends JsonValue>
         return schemas.contains(schema);
     }
 
-    public SchemaArrayImpl read(final JsonSubschemaParser parser,
-                                final JsonArray array,
-                                final JsonType type) throws JsonSchemaException {
+    public SchemaArrayImpl read(JsonSubschemaParser parser, JsonArray array)
+            throws JsonSchemaException {
 
         for (int i = 0, n = array.size(); i < n; i++) {
             final JsonValue value = array.get(i);
             final AbstractJsonSchema schema = parser.parse(getScope(), this, 
-                    getJsonPointer() + "/" + Integer.toString(i), value, type);
+                    getJsonPointer() + "/" + Integer.toString(i), value, null);
             add(schema);
         }
         

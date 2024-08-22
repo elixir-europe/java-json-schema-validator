@@ -32,7 +32,6 @@ import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonRecursiveReference;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
-import es.elixir.bsc.json.schema.model.JsonType;
 import java.util.stream.Stream;
 import javax.json.JsonObject;
 import javax.json.JsonString;
@@ -90,12 +89,12 @@ public class JsonRecursiveReferenceImpl extends AbstractJsonReferenceImpl
         
         return schema;
     }
-    @Override
-    public JsonRecursiveReferenceImpl read(final JsonSubschemaParser parser,
-                                           final JsonObject object, 
-                                           final JsonType type) throws JsonSchemaException {
 
-        super.read(parser, object, type);
+    @Override
+    public JsonRecursiveReferenceImpl read(JsonSubschemaParser parser, JsonObject object)
+            throws JsonSchemaException {
+
+        super.read(parser, object);
 
         final JsonString jrecursive_ref = JsonSchemaUtil.check(object.get(RECURSIVE_REF), JsonValue.ValueType.STRING);
         if (!"#".equals(jrecursive_ref.getString())) {

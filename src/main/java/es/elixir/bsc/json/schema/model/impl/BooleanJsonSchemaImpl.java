@@ -36,7 +36,6 @@ import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.BooleanJsonSchema;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
-import es.elixir.bsc.json.schema.model.JsonType;
 import javax.json.JsonValue;
 import javax.json.JsonValue.ValueType;
 import java.util.List;
@@ -62,9 +61,8 @@ public class BooleanJsonSchemaImpl extends AbstractJsonSchema<JsonValue>
     }
 
     @Override
-    public BooleanJsonSchemaImpl read(final JsonSubschemaParser parser,
-                                      final JsonValue schema,
-                                      final JsonType type) throws JsonSchemaException {
+    public BooleanJsonSchemaImpl read(JsonSubschemaParser parser, JsonValue schema)
+            throws JsonSchemaException {
 
         if (schema.getValueType() != ValueType.TRUE &&
             schema.getValueType() != ValueType.FALSE) {
@@ -78,7 +76,10 @@ public class BooleanJsonSchemaImpl extends AbstractJsonSchema<JsonValue>
     }
     
     @Override
-    public boolean validate(String jsonPointer, JsonValue value, JsonValue parent, List evaluated, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) throws ValidationException {
+    public boolean validate(String jsonPointer, JsonValue value, JsonValue parent, 
+            List evaluated, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) 
+            throws ValidationException {
+        
         if (!evaluation) {
             errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
                     ValidationMessage.UNEVALUATED_BOOLEAN_SCHEMA_MSG));

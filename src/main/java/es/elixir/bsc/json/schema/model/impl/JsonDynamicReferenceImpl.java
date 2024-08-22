@@ -32,7 +32,6 @@ import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonDynamicReference;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
-import es.elixir.bsc.json.schema.model.JsonType;
 import java.util.stream.Stream;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
@@ -107,9 +106,9 @@ public class JsonDynamicReferenceImpl extends JsonReferenceImpl
     
     @Override
     public JsonDynamicReferenceImpl read(JsonSubschemaParser parser, 
-            JsonObject object, JsonType type) throws JsonSchemaException {
+            JsonObject object) throws JsonSchemaException {
         
-        super.read(parser, object, type, DYNAMIC_REF);
+        super.read(parser, object, DYNAMIC_REF);
         
         return this;
     }

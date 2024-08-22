@@ -30,13 +30,20 @@ import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
+import es.elixir.bsc.json.schema.model.JsonArraySchema;
+import es.elixir.bsc.json.schema.model.JsonObjectSchema;
 import es.elixir.bsc.json.schema.model.JsonSchema;
+import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import es.elixir.bsc.json.schema.model.JsonType;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonString;
 import javax.json.JsonValue;
 import java.net.URI;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * The multiple types wrapper which is used when no type or a set of types is defined.
@@ -59,14 +66,21 @@ public class JsonMultitypeSchemaWrapper extends JsonAnyOfImpl<JsonObject> {
     }
 
     @Override
+    public Stream<JsonSchemaElement> getChildren() {
+        return StreamSupport.stream(
+                Spliterators.spliteratorUnknownSize(iterator(), Spliterator.ORDERED),false)
+                .filter(s -> s instanceof JsonObjectSchema || s instanceof JsonArraySchema)
+                .flatMap(JsonSchemaElement::getChildren);
+    }
+
+    @Override
     public JsonSchemaLocator getScope() {
         return scope;
     }
     
     @Override
-    public JsonAnyOfImpl read(final JsonSubschemaParser parser,
-                              final JsonObject object,
-                              final JsonType type) throws JsonSchemaException {
+    public JsonAnyOfImpl read(JsonSubschemaParser parser, JsonObject object)
+            throws JsonSchemaException {
 
         JsonValue $id = object.get(JsonSchema.ID);
         if ($id == null) {
