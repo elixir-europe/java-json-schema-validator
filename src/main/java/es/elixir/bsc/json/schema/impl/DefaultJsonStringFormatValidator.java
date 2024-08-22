@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -45,9 +45,8 @@ public class DefaultJsonStringFormatValidator implements JsonStringFormatValidat
     private final static Pattern IP4_PATTERN = Pattern.compile("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$");
     private final static Pattern IP6_PATTERN = Pattern.compile("^((?:[0-9A-Fa-f]{1,4}))((?::[0-9A-Fa-f]{1,4}))*::((?:[0-9A-Fa-f]{1,4}))((?::[0-9A-Fa-f]{1,4}))*|((?:[0-9A-Fa-f]{1,4}))((?::[0-9A-Fa-f]{1,4})){7}$");
     
-    public static void validate(final String jsonPointer, 
-                                final JsonStringSchema schema, 
-                                final String value) throws ValidationException {
+    public static void validate(String jsonPointer, JsonStringSchema schema,
+            String value) throws ValidationException {
 
         final String format = schema.getFormat();
         switch(format) {

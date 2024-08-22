@@ -52,6 +52,7 @@ import es.elixir.bsc.json.schema.model.impl.JsonConstImpl;
 import es.elixir.bsc.json.schema.model.impl.JsonReferenceImpl;
 import es.elixir.bsc.json.schema.model.impl.AbstractJsonSchemaElement;
 import es.elixir.bsc.json.schema.model.impl.JsonMultitypeSchemaWrapper;
+import java.io.IOException;
 import java.util.Map;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
@@ -83,7 +84,7 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
 
         if (value.getValueType() == ValueType.TRUE ||
             value.getValueType() == ValueType.FALSE) {
-            return new BooleanJsonSchemaImpl(parent, locator, jsonPointer).read(this, value, type);
+            return new BooleanJsonSchemaImpl(parent, locator, jsonPointer).read(this, value);
         }
 
         if (value.getValueType() != ValueType.OBJECT) {
@@ -101,8 +102,8 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
             }
             
             // before draft 2019-09 $ref ignored any other properties
-            if (JsonSchemaVersion.SCHEMA_DRAFT_2019_09.compareTo(getJsonSchemaVersion(object)) > 0) {
-                return new JsonReferenceImpl(parent, locator, jsonPointer).read(this, object, null);
+            if (JsonSchemaVersion.SCHEMA_DRAFT_2019_09.compareTo(getJsonSchemaVersion(locator)) > 0) {
+                return new JsonReferenceImpl(parent, locator, jsonPointer).read(this, object);
             }
         }
 
@@ -110,12 +111,12 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
         final ValueType vtype;
         if (type_value == null) {
             vtype = null;
-            } else {
+        } else {
             vtype = type_value.getValueType();
             switch(vtype) {
                 case STRING: 
             try {
-                        type = JsonType.fromValue(((JsonString)type_value).getString());
+                type = JsonType.fromValue(((JsonString)type_value).getString());
             } catch(IllegalArgumentException ex) {
                 throw new JsonSchemaException(new ParsingError(
                         ParsingMessage.UNKNOWN_OBJECT_TYPE, ((JsonString)type_value).getString()));
@@ -134,29 +135,29 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
             if (jenum.isEmpty()) {
                 throw new JsonSchemaException(new ParsingError(ParsingMessage.EMPTY_ENUM));
             }
-            return new JsonEnumImpl(parent, locator, jsonPointer).read(this, object, type);
+            return new JsonEnumImpl(parent, locator, jsonPointer).read(this, object);
         }
 
         final JsonValue jconst = object.get(CONST);
         if (jconst != null) {
-            return new JsonConstImpl(parent, locator, jsonPointer).read(this, object, type);
+            return new JsonConstImpl(parent, locator, jsonPointer).read(this, object);
         }
 
         if (type == null) {
             return new JsonMultitypeSchemaWrapper(parent, locator, jsonPointer, 
                     vtype == ValueType.ARRAY ? type_value.asJsonArray() : null)
-                    .read(this, object, null);
+                    .read(this, object);
         }
 
         final AbstractJsonSchema schema;
         switch(type) {
-            case OBJECT: schema = new JsonObjectSchemaImpl(parent, locator, jsonPointer).read(this, object, type); break;
-            case ARRAY: schema = new JsonArraySchemaImpl(parent, locator, jsonPointer).read(this, object, type); break;
-            case STRING: schema = new JsonStringSchemaImpl(parent, locator, jsonPointer).read(this, object, type); break;
-            case NUMBER: schema = new JsonNumberSchemaImpl(parent, locator, jsonPointer).read(this, object, type); break;
-            case INTEGER: schema = new JsonIntegerSchemaImpl(parent, locator, jsonPointer).read(this, object, type); break;
-            case BOOLEAN: schema = new JsonBooleanSchemaImpl(parent, locator, jsonPointer).read(this, object, type); break;
-            case NULL: schema = new JsonNullSchemaImpl(parent, locator, jsonPointer).read(this, object, type); break;
+            case OBJECT: schema = new JsonObjectSchemaImpl(parent, locator, jsonPointer).read(this, object); break;
+            case ARRAY: schema = new JsonArraySchemaImpl(parent, locator, jsonPointer).read(this, object); break;
+            case STRING: schema = new JsonStringSchemaImpl(parent, locator, jsonPointer).read(this, object); break;
+            case NUMBER: schema = new JsonNumberSchemaImpl(parent, locator, jsonPointer).read(this, object); break;
+            case INTEGER: schema = new JsonIntegerSchemaImpl(parent, locator, jsonPointer).read(this, object); break;
+            case BOOLEAN: schema = new JsonBooleanSchemaImpl(parent, locator, jsonPointer).read(this, object); break;
+            case NULL: schema = new JsonNullSchemaImpl(parent, locator, jsonPointer).read(this, object); break;
             default: return null;
         }
 
@@ -164,13 +165,19 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
     }
     
     @Override
-    public JsonSchemaVersion getJsonSchemaVersion(JsonObject object) {
-        final JsonValue jversion = object.get(JsonSchema.SCHEMA);
-        if (jversion != null && jversion.getValueType() == JsonValue.ValueType.STRING) {
-            try {
-                return JsonSchemaVersion.fromValue(((JsonString)jversion).getString());
-            } catch(IllegalArgumentException ex) {}
-        }
+    public JsonSchemaVersion getJsonSchemaVersion(JsonSchemaLocator locator) {
+        final JsonValue schema;
+        try {
+            schema = locator.getSchema("/");
+            if (JsonValue.ValueType.OBJECT == schema.getValueType()) {
+                final JsonValue jversion = schema.asJsonObject().get(JsonSchema.SCHEMA);
+                if (jversion != null && jversion.getValueType() == JsonValue.ValueType.STRING) {
+                    try {
+                        return JsonSchemaVersion.fromValue(((JsonString)jversion).getString());
+                    } catch(IllegalArgumentException ex) {}
+                }
+            }
+        } catch (IOException ex) {}
         
         final Object version = properties.get(JsonSchemaParserConfig.JSON_SCHEMA_VERSION);
         if (version instanceof JsonSchemaVersion) {
@@ -179,4 +186,5 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
         
         return JsonSchemaVersion.SCHEMA_DRAFT_07; // default
     }
+
 }

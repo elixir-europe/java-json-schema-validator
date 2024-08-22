@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -33,7 +33,6 @@ import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.impl.AbstractJsonSchema;
 import es.elixir.bsc.json.schema.model.impl.AbstractJsonSchemaElement;
 import java.util.Map;
-import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
 /**
@@ -56,7 +55,7 @@ public interface JsonSubschemaParser extends JsonSchemaParser {
      */
     Map<String, Object> getJsonSchemaParserProperties();
     
-    JsonSchemaVersion getJsonSchemaVersion(JsonObject object);
+    JsonSchemaVersion getJsonSchemaVersion(JsonSchemaLocator locator);
 
     @Override
     default AbstractJsonSchema parse(JsonSchemaLocator locator, JsonValue schema)

@@ -91,11 +91,10 @@ public class JsonReferenceImpl extends AbstractJsonReferenceImpl implements Json
     }
 
     @Override
-    public JsonReferenceImpl read(final JsonSubschemaParser parser,
-                                  final JsonObject object, 
-                                  final JsonType type) throws JsonSchemaException {
+    public JsonReferenceImpl read(JsonSubschemaParser parser, JsonObject object)
+            throws JsonSchemaException {
         
-        super.read(parser, object, type, REF);
+        super.read(parser, object, REF);
         return this;
     }
 }

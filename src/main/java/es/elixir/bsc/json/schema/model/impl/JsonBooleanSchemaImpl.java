@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -32,7 +32,6 @@ import es.elixir.bsc.json.schema.model.JsonBooleanSchema;
 import java.util.List;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.ValidationMessage;
-import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
@@ -50,11 +49,10 @@ public class JsonBooleanSchemaImpl extends PrimitiveSchemaImpl
     }
 
     @Override
-    public JsonBooleanSchemaImpl read(final JsonSubschemaParser parser,
-                                      final JsonObject object,
-                                      final JsonType type) throws JsonSchemaException {
+    public JsonBooleanSchemaImpl read(JsonSubschemaParser parser, JsonObject object)
+            throws JsonSchemaException {
 
-        super.read(parser, object, type);
+        super.read(parser, object);
 
         return this;
     }

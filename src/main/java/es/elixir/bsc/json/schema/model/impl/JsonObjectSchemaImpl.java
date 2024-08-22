@@ -38,7 +38,6 @@ import es.elixir.bsc.json.schema.model.StringArray;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
-import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonDependentProperties;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
@@ -164,11 +163,10 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
     }
 
     @Override
-    public JsonObjectSchemaImpl read(final JsonSubschemaParser parser,
-                                     final JsonObject object,
-                                     final JsonType type) throws JsonSchemaException {
+    public JsonObjectSchemaImpl read(JsonSubschemaParser parser, JsonObject object)
+            throws JsonSchemaException {
         
-        super.read(parser, object, type);
+        super.read(parser, object);
         
         final JsonObject jproperties = JsonSchemaUtil.check(object.get(PROPERTIES), ValueType.OBJECT);
         if (jproperties != null) {
@@ -211,7 +209,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
         final JsonValue junevaluatedProperties = object.get(UNEVALUATED_PROPERTIES);
         if (junevaluatedProperties != null) {
             switch(junevaluatedProperties.getValueType()) {
-                case OBJECT: unevaluatedPropertiesSchema = parser.parse(getScope(), this, getJsonPointer() + "/" + UNEVALUATED_PROPERTIES, junevaluatedProperties, type); break;
+                case OBJECT: unevaluatedPropertiesSchema = parser.parse(getScope(), this, getJsonPointer() + "/" + UNEVALUATED_PROPERTIES, junevaluatedProperties, null); break;
                 case TRUE:   unevaluatedProperties = true; break;
                 case FALSE:  unevaluatedProperties = false; break;
                 default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
@@ -222,10 +220,10 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
         final JsonValue jpropertyNames = object.get(PROPERTY_NAMES);
         if (jpropertyNames != null) {
             switch(jpropertyNames.getValueType()) {
-                case OBJECT: propertyNames = new JsonStringSchemaImpl(this, getScope(), getJsonPointer() + "/" + PROPERTY_NAMES).read(parser, jpropertyNames.asJsonObject(), null);
+                case OBJECT: propertyNames = new JsonStringSchemaImpl(this, getScope(), getJsonPointer() + "/" + PROPERTY_NAMES).read(parser, jpropertyNames.asJsonObject());
                              break;
                 case TRUE:   
-                case FALSE:  propertyNames = new BooleanJsonSchemaImpl(this, getScope(), getJsonPointer() + "/" + PROPERTY_NAMES).read(parser, jpropertyNames, null);
+                case FALSE:  propertyNames = new BooleanJsonSchemaImpl(this, getScope(), getJsonPointer() + "/" + PROPERTY_NAMES).read(parser, jpropertyNames);
                              break;
                 default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
                                     PROPERTY_NAMES, jpropertyNames.getValueType().name(), "either object or boolean"));

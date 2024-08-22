@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+  ~ Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
   ~ and Barcelona Supercomputing Center (BSC)
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,7 +24,7 @@
 
     <groupId>es.elixir.bsc.json.schema</groupId>
     <artifactId>jakarta.jaronuinga</artifactId>
-    <version>0.5.3</version>
+    <version>0.5.4</version>
     <packaging>jar</packaging>
 
     <organization>

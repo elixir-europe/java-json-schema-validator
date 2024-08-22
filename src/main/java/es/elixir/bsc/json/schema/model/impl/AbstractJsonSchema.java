@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -32,7 +32,6 @@ import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationException;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonSchema;
-import es.elixir.bsc.json.schema.model.JsonType;
 import java.util.ArrayList;
 import java.util.List;
 import jakarta.json.JsonValue;
@@ -54,8 +53,8 @@ public abstract class AbstractJsonSchema<T extends JsonValue>
         super(parent, locator, jsonPointer);
     }
     
-    public AbstractJsonSchema<T> read(JsonSubschemaParser parser, T value,
-            JsonType type) throws JsonSchemaException {
+    public AbstractJsonSchema<T> read(JsonSubschemaParser parser, T value)
+            throws JsonSchemaException {
         return this;
     }
     

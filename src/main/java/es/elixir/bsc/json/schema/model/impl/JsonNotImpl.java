@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -35,7 +35,6 @@ import es.elixir.bsc.json.schema.model.JsonNot;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import java.util.ArrayList;
 import java.util.List;
-import es.elixir.bsc.json.schema.model.JsonType;
 import java.util.stream.Stream;
 import jakarta.json.JsonValue;
 
@@ -69,11 +68,10 @@ public class JsonNotImpl extends AbstractJsonSchema<JsonValue>
     }
     
     @Override
-    public JsonNotImpl read(final JsonSubschemaParser parser,
-                            final JsonValue value,
-                            final JsonType type) throws JsonSchemaException {
-        this.schema = parser.parse(getScope(), null, getJsonPointer(), value, null);
+    public JsonNotImpl read(JsonSubschemaParser parser, JsonValue value)
+            throws JsonSchemaException {
         
+        this.schema = parser.parse(getScope(), null, getJsonPointer(), value, null);
         return this;
     }
     

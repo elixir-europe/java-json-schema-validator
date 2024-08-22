@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -34,7 +34,6 @@ import java.util.List;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.ValidationException;
 import es.elixir.bsc.json.schema.impl.DefaultJsonStringFormatValidator;
-import es.elixir.bsc.json.schema.model.JsonType;
 import java.util.regex.Pattern;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import jakarta.json.JsonNumber;
@@ -102,11 +101,10 @@ public class JsonStringSchemaImpl extends PrimitiveSchemaImpl
     }
     
     @Override
-    public JsonStringSchemaImpl read(final JsonSubschemaParser parser,
-                                     final JsonObject object,
-                                     final JsonType type) throws JsonSchemaException {
+    public JsonStringSchemaImpl read(JsonSubschemaParser parser, JsonObject object)
+            throws JsonSchemaException {
 
-        super.read(parser, object, type);
+        super.read(parser, object);
         
         final JsonNumber min = JsonSchemaUtil.check(object.getJsonNumber(MIN_LENGTH), JsonValue.ValueType.NUMBER);
         if (min != null) {

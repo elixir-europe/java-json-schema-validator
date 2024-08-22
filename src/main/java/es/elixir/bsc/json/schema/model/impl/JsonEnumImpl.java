@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -31,7 +31,6 @@ import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.model.JsonEnum;
-import es.elixir.bsc.json.schema.model.JsonType;
 import java.util.List;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import jakarta.json.JsonObject;
@@ -61,11 +60,10 @@ public class JsonEnumImpl extends PrimitiveSchemaImpl implements JsonEnum {
     }
     
     @Override
-    public JsonEnumImpl read(final JsonSubschemaParser parser,
-                             final JsonObject object,
-                             final JsonType type) throws JsonSchemaException {
+    public JsonEnumImpl read(JsonSubschemaParser parser, JsonObject object)
+            throws JsonSchemaException {
 
-        super.read(parser, object, type);
+        super.read(parser, object);
         
         values = JsonSchemaUtil.check(object.get(ENUM), JsonValue.ValueType.ARRAY);
         
