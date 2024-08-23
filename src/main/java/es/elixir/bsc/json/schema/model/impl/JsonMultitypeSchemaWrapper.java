@@ -121,7 +121,7 @@ public class JsonMultitypeSchemaWrapper extends JsonAnyOfImpl<JsonObject> {
                 }
                 try {
                      final JsonType t = JsonType.fromValue(((JsonString)val).getString());
-                     add(parser.parse(locator, parent, getJsonPointer(), object, t));
+                     add(parser.parse(locator, this, getJsonPointer(), object, t));
                 } catch(IllegalArgumentException ex) {
                     throw new JsonSchemaException(
                         new ParsingError(ParsingMessage.UNKNOWN_OBJECT_TYPE, val));
