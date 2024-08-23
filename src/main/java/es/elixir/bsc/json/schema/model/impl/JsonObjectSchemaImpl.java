@@ -186,7 +186,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
 
         final JsonObject jpatternProperties = JsonSchemaUtil.check(object.get(PATTERN_PROPERTIES), ValueType.OBJECT);
         if (jpatternProperties != null) {
-            patternProperties = new JsonPropertiesImpl(this, getScope(), getJsonPointer() + "/" + DEPENDENT_SCHEMAS)
+            patternProperties = new JsonPropertiesImpl(this, getScope(), getJsonPointer() + "/" + PATTERN_PROPERTIES)
                     .read(parser, jpatternProperties);
         }
         

@@ -115,12 +115,12 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
             vtype = type_value.getValueType();
             switch(vtype) {
                 case STRING: 
-            try {
-                type = JsonType.fromValue(((JsonString)type_value).getString());
-            } catch(IllegalArgumentException ex) {
-                throw new JsonSchemaException(new ParsingError(
-                        ParsingMessage.UNKNOWN_OBJECT_TYPE, ((JsonString)type_value).getString()));
-            }
+                    try {
+                        type = JsonType.fromValue(((JsonString)type_value).getString());
+                    } catch(IllegalArgumentException ex) {
+                        throw new JsonSchemaException(new ParsingError(
+                                ParsingMessage.UNKNOWN_OBJECT_TYPE, ((JsonString)type_value).getString()));
+                    }
                 case ARRAY: break;
                 default:
                     throw new JsonSchemaException(new ParsingError(
@@ -151,17 +151,17 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
 
         final AbstractJsonSchema schema;
         switch(type) {
-            case OBJECT: schema = new JsonObjectSchemaImpl(parent, locator, jsonPointer).read(this, object); break;
-            case ARRAY: schema = new JsonArraySchemaImpl(parent, locator, jsonPointer).read(this, object); break;
-            case STRING: schema = new JsonStringSchemaImpl(parent, locator, jsonPointer).read(this, object); break;
-            case NUMBER: schema = new JsonNumberSchemaImpl(parent, locator, jsonPointer).read(this, object); break;
-            case INTEGER: schema = new JsonIntegerSchemaImpl(parent, locator, jsonPointer).read(this, object); break;
-            case BOOLEAN: schema = new JsonBooleanSchemaImpl(parent, locator, jsonPointer).read(this, object); break;
-            case NULL: schema = new JsonNullSchemaImpl(parent, locator, jsonPointer).read(this, object); break;
+            case OBJECT: schema = new JsonObjectSchemaImpl(parent, locator, jsonPointer); break;
+            case ARRAY: schema = new JsonArraySchemaImpl(parent, locator, jsonPointer); break;
+            case STRING: schema = new JsonStringSchemaImpl(parent, locator, jsonPointer); break;
+            case NUMBER: schema = new JsonNumberSchemaImpl(parent, locator, jsonPointer); break;
+            case INTEGER: schema = new JsonIntegerSchemaImpl(parent, locator, jsonPointer); break;
+            case BOOLEAN: schema = new JsonBooleanSchemaImpl(parent, locator, jsonPointer); break;
+            case NULL: schema = new JsonNullSchemaImpl(parent, locator, jsonPointer); break;
             default: return null;
         }
 
-        return schema;
+        return schema.read(this, object);
     }
     
     @Override

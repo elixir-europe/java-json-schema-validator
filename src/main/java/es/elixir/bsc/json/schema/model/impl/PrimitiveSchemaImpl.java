@@ -213,15 +213,7 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
                         JsonSchema.DEFS, jdefs.getValueType().name(), JsonValue.ValueType.OBJECT.name()));
             }
             for (Map.Entry<String, JsonValue> entry : jdefs.asJsonObject().entrySet()) {
-                final JsonValue subschema = entry.getValue();
-                switch(subschema.getValueType()) {
-                    case OBJECT:
-                    case TRUE: 
-                    case FALSE:  parser.parse(getScope(), parent, getJsonPointer() + "/" + JsonSchema.DEFS + "/" + entry.getKey(), subschema, null);
-                                 break;
-                    default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                                     entry.getKey(), subschema.getValueType().name(), JsonValue.ValueType.OBJECT.name()));
-                }
+                parser.parse(getScope(), this, getJsonPointer() + "/" + JsonSchema.DEFS + "/" + entry.getKey(), entry.getValue(), null);
             }
         }
 
@@ -232,15 +224,7 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
                        "definitions", jdefinitions.getValueType().name(), JsonValue.ValueType.OBJECT.name()));
             }
             for (Map.Entry<String, JsonValue> entry : jdefinitions.asJsonObject().entrySet()) {
-                final JsonValue subschema = entry.getValue();
-                switch(subschema.getValueType()) {
-                    case OBJECT:
-                    case TRUE:
-                    case FALSE:  parser.parse(getScope(), this, getJsonPointer() + "/definitions/" + entry.getKey(), subschema, null);
-                                 break;
-                    default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                                    entry.getKey(), subschema.getValueType().name(), JsonValue.ValueType.OBJECT.name()));
-                }
+                parser.parse(getScope(), this, getJsonPointer() + "/definitions/" + entry.getKey(), entry.getValue(), null);
             }
         }
 
@@ -284,41 +268,17 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
 
         final JsonValue jif = object.get(IF);
         if (jif != null) {
-            switch(jif.getValueType()) {
-                case OBJECT: _if = parser.parse(scope, this, getJsonPointer() + "/" + IF, jif, null);
-                             break;
-                case TRUE:
-                case FALSE:  _if = new BooleanJsonSchemaImpl(this, scope, getJsonPointer()).read(parser, jif);
-                             break;
-                default: throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                                            IF, jif.getValueType().name(), "either object or boolean"));
-            }
+            _if = parser.parse(scope, this, getJsonPointer() + "/" + IF, jif, null);
         }
 
         final JsonValue jelse = object.get(ELSE);
         if (jelse != null) {
-            switch(jelse.getValueType()) {
-                case OBJECT: _else = parser.parse(scope, this, getJsonPointer() + "/" + ELSE, jelse, null);
-                             break;
-                case TRUE:
-                case FALSE:  _else = new BooleanJsonSchemaImpl(this, scope, getJsonPointer()).read(parser, jelse);
-                             break;
-                default: throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                                        ELSE, jelse.getValueType().name(), "either object or boolean"));
-            }
+            _else = parser.parse(scope, this, getJsonPointer() + "/" + ELSE, jelse, null);
         }
 
         final JsonValue jthen = object.get(THEN);
         if (jthen != null) {
-            switch(jthen.getValueType()) {
-                case OBJECT: _then = parser.parse(scope, this, getJsonPointer() + "/" + THEN, jthen, null);
-                             break;
-                case TRUE:
-                case FALSE:  _then = new BooleanJsonSchemaImpl(this, scope, getJsonPointer()).read(parser, jthen);
-                             break;
-                default: throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                                       THEN, jthen.getValueType().name(), "either object or boolean"));                             
-            }
+            _then = parser.parse(scope, this, getJsonPointer() + "/" + THEN, jthen, null);
         }
         
         final JsonValue jref = object.get(JsonReference.REF);
