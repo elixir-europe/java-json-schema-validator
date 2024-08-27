@@ -50,6 +50,10 @@ public interface PrimitiveSchema<T extends JsonSchema> extends JsonSchema {
     public final static String THEN = "then";
     public final static String ELSE = "else";
 
+    String getAnchor();
+    String getDynamicAnchor();
+    Boolean getRecursiveAnchor();
+
     JsonAllOf getAllOf();
     JsonAnyOf getAnyOf();
     JsonOneOf getOneOf();

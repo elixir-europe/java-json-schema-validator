@@ -32,7 +32,6 @@ import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonReference;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
-import es.elixir.bsc.json.schema.model.JsonType;
 import java.io.IOException;
 import java.util.stream.Stream;
 import javax.json.JsonException;
@@ -45,9 +44,9 @@ import javax.json.JsonValue;
 
 public class JsonReferenceImpl extends AbstractJsonReferenceImpl implements JsonReference {
     
-    public JsonReferenceImpl(AbstractJsonSchemaElement parent, JsonSchemaLocator locator,
-            String jsonPointer) {
-        super(parent, locator, jsonPointer);
+    public JsonReferenceImpl(AbstractJsonSchemaElement parent, 
+            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
+        super(parent, scope, locator, jsonPointer);
     }
 
     @Override

@@ -49,9 +49,9 @@ public abstract class SchemaArrayImpl<T extends JsonValue>
     
     private final Set<AbstractJsonSchema> schemas;
     
-    public SchemaArrayImpl(AbstractJsonSchemaElement parent, JsonSchemaLocator locator,
-            String jsonPointer) {
-        super(parent, locator, jsonPointer);
+    public SchemaArrayImpl(AbstractJsonSchemaElement parent, 
+            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
+        super(parent, scope, locator, jsonPointer);
 
         schemas = new HashSet();
     }
@@ -89,7 +89,7 @@ public abstract class SchemaArrayImpl<T extends JsonValue>
 
         for (int i = 0, n = array.size(); i < n; i++) {
             final JsonValue value = array.get(i);
-            final AbstractJsonSchema schema = parser.parse(getScope(), this, 
+            final AbstractJsonSchema schema = parser.parse(scope, this, 
                     getJsonPointer() + "/" + Integer.toString(i), value, null);
             add(schema);
         }

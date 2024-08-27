@@ -59,10 +59,12 @@ import java.util.Map;
 public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
         implements PrimitiveSchema<AbstractJsonSchema> {
 
-    private JsonSchemaLocator scope;
-
     private String title;
     private String description;
+    
+    private String anchor;
+    private String dynamic_anchor;
+    private Boolean recursive_anchor;
     
     private JsonAllOfImpl allOf;
     private JsonAnyOfImpl anyOf;
@@ -80,9 +82,9 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
      */
     private AbstractJsonReferenceImpl ref;
     
-    public PrimitiveSchemaImpl(AbstractJsonSchemaElement parent, JsonSchemaLocator locator, 
-            String jsonPointer) {
-        super(parent, locator, jsonPointer);
+    public PrimitiveSchemaImpl(AbstractJsonSchemaElement parent, 
+            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
+        super(parent, scope, locator, jsonPointer);
     }
 
     @Override
@@ -97,11 +99,6 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
                 _else != null ? _else.getChildren() : null,
                 ref != null ? ref.getChildren() : null)
                 .flatMap(c -> c);
-    }
-
-    @Override
-    public JsonSchemaLocator getScope() {
-        return scope;
     }
     
     public String getTitle() {
@@ -118,6 +115,21 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
     
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public String getAnchor() {
+        return anchor;
+    }
+
+    @Override
+    public String getDynamicAnchor() {
+        return dynamic_anchor;
+    }
+
+    @Override
+    public Boolean getRecursiveAnchor() {
+        return recursive_anchor;
     }
 
     @Override
@@ -164,26 +176,6 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
     public PrimitiveSchemaImpl read(JsonSubschemaParser parser, JsonObject object)
             throws JsonSchemaException {
 
-        JsonValue $id = object.get(JsonSchema.ID);
-        if ($id == null) {
-            $id = object.get("id"); // draft4
-        } 
-
-        if ($id == null) {
-            scope = locator;
-        } else if ($id.getValueType() != JsonValue.ValueType.STRING) {
-                throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                    "id", $id.getValueType().name(), JsonValue.ValueType.STRING.name()));
-        } else {
-            final String id = ((JsonString)$id).getString();
-            try {
-                scope = locator.resolve(URI.create(id));
-                scope.setSchema(object);
-            } catch(IllegalArgumentException ex) {
-                throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_REFERENCE, id));
-            }
-        }
-
         final JsonString jtitle = JsonSchemaUtil.check(object.get(TITLE), JsonValue.ValueType.STRING);
         if (jtitle != null) {
             setTitle(jtitle.getString());
@@ -196,14 +188,24 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
 
         final JsonString janchor = JsonSchemaUtil.check(object.get(JsonSchema.ANCHOR), JsonValue.ValueType.STRING);
         if (janchor != null) {
-            final String anchor = janchor.getString();
+            anchor = janchor.getString();
             scope.resolve(URI.create("#" + anchor)).setSchema(object);
+        }
+
+        final JsonValue jrecursiveanchor = object.get(RECURSIVE_ANCHOR);
+        if (jrecursiveanchor != null) {
+            switch(jrecursiveanchor.getValueType()) {
+                case TRUE:  recursive_anchor = true; break;
+                case FALSE: recursive_anchor = false; break;
+                default: throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
+                                       RECURSIVE_ANCHOR, jrecursiveanchor.getValueType().name(), "must be boolean"));
+            }
         }
 
         final JsonString jdynamicanchor = JsonSchemaUtil.check(object.get(JsonSchema.DYNAMIC_ANCHOR), JsonValue.ValueType.STRING);
         if (jdynamicanchor != null) {
-            final String anchor = jdynamicanchor.getString();
-            scope.resolve(URI.create("#" + anchor)).setSchema(object);
+            dynamic_anchor = jdynamicanchor.getString();
+            scope.resolve(URI.create("#" + dynamic_anchor)).setSchema(object);
         }
 
         JsonValue jdefs = object.get(JsonSchema.DEFS);
@@ -213,7 +215,7 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
                         JsonSchema.DEFS, jdefs.getValueType().name(), JsonValue.ValueType.OBJECT.name()));
             }
             for (Map.Entry<String, JsonValue> entry : jdefs.asJsonObject().entrySet()) {
-                parser.parse(getScope(), this, getJsonPointer() + "/" + JsonSchema.DEFS + "/" + entry.getKey(), entry.getValue(), null);
+                parser.parse(scope, this, getJsonPointer() + "/" + JsonSchema.DEFS + "/" + entry.getKey(), entry.getValue(), null);
             }
         }
 
@@ -224,13 +226,13 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
                        "definitions", jdefinitions.getValueType().name(), JsonValue.ValueType.OBJECT.name()));
             }
             for (Map.Entry<String, JsonValue> entry : jdefinitions.asJsonObject().entrySet()) {
-                parser.parse(getScope(), this, getJsonPointer() + "/definitions/" + entry.getKey(), entry.getValue(), null);
+                parser.parse(scope, this, getJsonPointer() + "/definitions/" + entry.getKey(), entry.getValue(), null);
             }
         }
 
         final JsonArray jallOf = JsonSchemaUtil.check(object.get(ALL_OF), JsonValue.ValueType.ARRAY);
         if (jallOf != null) {
-            final JsonAllOfImpl _allOf = new JsonAllOfImpl(this, scope, getJsonPointer() + "/" + ALL_OF)
+            final JsonAllOfImpl _allOf = new JsonAllOfImpl(this, scope, scope, jsonPointer + "/" + ALL_OF)
                     .read(parser, jallOf);
             if (allOf == null) {
                 allOf = _allOf;
@@ -243,13 +245,13 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
         
         final JsonArray janyOf = JsonSchemaUtil.check(object.get(ANY_OF), JsonValue.ValueType.ARRAY);
         if (janyOf != null) {
-            anyOf = new JsonAnyOfImpl(this, scope, getJsonPointer() + "/" + ANY_OF);
+            anyOf = new JsonAnyOfImpl(this, scope, scope, jsonPointer + "/" + ANY_OF);
             anyOf.read(parser, janyOf);
         }
         
         final JsonArray joneOf = JsonSchemaUtil.check(object.get(ONE_OF), JsonValue.ValueType.ARRAY);
         if (joneOf != null) {
-            oneOf = new JsonOneOfImpl(this, scope, getJsonPointer() + "/" + ONE_OF);
+            oneOf = new JsonOneOfImpl(this, scope, scope, jsonPointer + "/" + ONE_OF);
             oneOf.read(parser, joneOf);
         }
 
@@ -258,7 +260,7 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
             switch(jnot.getValueType()) {
                 case OBJECT:
                 case TRUE:
-                case FALSE: not = new JsonNotImpl(this, scope, getJsonPointer() + "/" + NOT)
+                case FALSE: not = new JsonNotImpl(this, scope, scope, jsonPointer + "/" + NOT)
                                         .read(parser, jnot);
                             break;
                 default: throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
@@ -289,7 +291,7 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
                        JsonReference.REF, jref.getValueType().name(), JsonValue.ValueType.STRING.name()));
             }
 
-            ref = new JsonReferenceImpl(this, scope, getJsonPointer()).read(parser, object);
+            ref = new JsonReferenceImpl(this, scope, scope, jsonPointer).read(parser, object);
         }
 
         final JsonValue jdynamic_ref = object.get(JsonDynamicReference.DYNAMIC_REF);
@@ -304,7 +306,7 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
                 throw new JsonSchemaException(new ParsingError(ParsingMessage.INCOMPATIBLE_KEYWORDS, 
                             String.join(",", List.of(JsonRecursiveReference.REF, JsonDynamicReference.DYNAMIC_REF))));
             }
-            ref = new JsonDynamicReferenceImpl(this, scope, getJsonPointer()).read(parser, object);
+            ref = new JsonDynamicReferenceImpl(this, scope, scope, jsonPointer).read(parser, object);
         }
 
         final JsonValue jrecursive_ref = object.get(JsonRecursiveReference.RECURSIVE_REF);
@@ -320,7 +322,7 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
                         String.join(",", List.of(JsonRecursiveReference.REF, JsonRecursiveReference.RECURSIVE_REF))));
             }
             
-            ref = new JsonRecursiveReferenceImpl(this, scope, getJsonPointer()).read(parser, object);
+            ref = new JsonRecursiveReferenceImpl(this, scope, scope, jsonPointer).read(parser, object);
         }
         
         return this;

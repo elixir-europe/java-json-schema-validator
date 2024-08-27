@@ -45,12 +45,11 @@ import javax.json.JsonValue;
 public class JsonPropertiesImpl extends AbstractJsonSchemaElement
                                 implements JsonProperties<AbstractJsonSchema> {
 
-    private final Map<String, AbstractJsonSchema> properties;
+    private final Map<String, AbstractJsonSchema> properties = new LinkedHashMap();
     
-    public JsonPropertiesImpl(AbstractJsonSchema parent, JsonSchemaLocator locator,
-            String jsonPointer) {
-        super(parent, locator, jsonPointer);
-        properties = new LinkedHashMap();
+    public JsonPropertiesImpl(AbstractJsonSchema parent, 
+            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
+        super(parent, scope, locator, jsonPointer);
     }
 
     @Override

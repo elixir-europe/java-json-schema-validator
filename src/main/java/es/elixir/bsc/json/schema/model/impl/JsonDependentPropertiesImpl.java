@@ -48,12 +48,11 @@ import java.util.stream.Stream;
 public class JsonDependentPropertiesImpl extends AbstractJsonSchemaElement
         implements JsonDependentProperties {
 
-    private final Map<String, StringArray> properties;
+    private final Map<String, StringArray> properties = new LinkedHashMap();
     
-    public JsonDependentPropertiesImpl(AbstractJsonSchema parent, JsonSchemaLocator locator,
-            String jsonPointer) {
-        super(parent, locator, jsonPointer);
-        properties = new LinkedHashMap();
+    public JsonDependentPropertiesImpl(AbstractJsonSchema parent, 
+            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
+        super(parent, scope, locator, jsonPointer);
     }
     
     @Override

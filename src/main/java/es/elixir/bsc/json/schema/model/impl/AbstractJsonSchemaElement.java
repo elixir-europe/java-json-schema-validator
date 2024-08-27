@@ -30,40 +30,54 @@ import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import java.net.URI;
 
 /**
+ * This is an root class that any JSON Schema element inherits from.
+ * It contains minimum properties to identify and locate the element in 
+ * parsed JSON Schema tree.
+ * 
  * @author Dmitry Repchevsky
  */
 
 public abstract class AbstractJsonSchemaElement implements JsonSchemaElement {
     
     public final AbstractJsonSchemaElement parent;
+    
+    public final JsonSchemaLocator scope;
     public final JsonSchemaLocator locator;
-    private final String jsonPointer;
-
-    public AbstractJsonSchemaElement(AbstractJsonSchemaElement parent, JsonSchemaLocator locator, 
-            String jsonPointer) {
+    public final String jsonPointer;
+    
+    /**
+     * Constructor of the object.
+     * It only sets an essential properties to identify and locate the element in
+     * the JSON Schema.
+     * 
+     * @param parent a parent element that encloses this one
+     * @param scope current element scope (may or may not be equal to the location)
+     * @param locator the locator that was used to load this document
+     * @param jsonPointer JSON Pointer to the parsed JSON Value that represents this element.
+     */
+    public AbstractJsonSchemaElement(AbstractJsonSchemaElement parent, 
+            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
 
         this.parent = parent;
+
+        this.scope = scope;
         this.locator = locator;
         this.jsonPointer = jsonPointer.startsWith("//") ? jsonPointer.substring(1) : jsonPointer;
     }
 
     @Override
     public final URI getId() {
-        return getScope().uri;
+        return scope.uri;
     }
 
     @Override
     public String getJsonPointer() {
         // when scope != locator (new scope) jsonPointer is 'root'
-        return getScope() == locator ? jsonPointer : "/";
+        return scope == locator ? jsonPointer : "/";
     }
 
     @Override
     public AbstractJsonSchemaElement getParent() {
         return parent;
-    }
-
-    public JsonSchemaLocator getScope() {
-        return locator;
     }
 }
