@@ -56,9 +56,9 @@ public abstract class AbstractJsonReferenceImpl extends AbstractJsonSchema<JsonO
     protected JsonSchemaLocator ref_locator;
     protected JsonSubschemaParser parser;
     
-    public AbstractJsonReferenceImpl(AbstractJsonSchemaElement parent, JsonSchemaLocator locator,
-            String jsonPointer) {
-        super(parent, locator, jsonPointer);
+    public AbstractJsonReferenceImpl(AbstractJsonSchemaElement parent, 
+            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
+        super(parent, scope, locator, jsonPointer);
     }
     
     protected void read(JsonSubschemaParser parser, JsonObject object, String tag)
@@ -72,21 +72,21 @@ public abstract class AbstractJsonReferenceImpl extends AbstractJsonSchema<JsonO
             final String fragment = ref.getFragment();
             if (fragment == null) {
                 ref_pointer = "/";
-                ref_locator = getScope().resolve(ref);
+                ref_locator = scope.resolve(ref);
             } else if ("#".equals(jref)) {
                 ref_pointer = "/";
-                ref_locator = getScope();
+                ref_locator = scope;
             } else if (fragment.startsWith("/")) {
                 ref_pointer = fragment;
                 if (jref.startsWith("#")) {
-                    ref_locator = getScope();
+                    ref_locator = scope;
                 } else {
-                    ref_locator = getScope().resolve(
+                    ref_locator = scope.resolve(
                         new URI(ref.getScheme(), ref.getSchemeSpecificPart(), null));                        
                 }
             } else {
                 ref_pointer = "/";
-                ref_locator = getScope().resolve(ref);
+                ref_locator = scope.resolve(ref);
             }
         } catch(JsonException | IllegalArgumentException | URISyntaxException ex) {
             throw new JsonSchemaException(

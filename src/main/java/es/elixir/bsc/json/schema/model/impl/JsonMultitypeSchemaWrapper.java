@@ -32,14 +32,12 @@ import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonArraySchema;
 import es.elixir.bsc.json.schema.model.JsonObjectSchema;
-import es.elixir.bsc.json.schema.model.JsonSchema;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import es.elixir.bsc.json.schema.model.JsonType;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
-import java.net.URI;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Stream;
@@ -55,12 +53,12 @@ import java.util.stream.StreamSupport;
 
 public class JsonMultitypeSchemaWrapper extends JsonAnyOfImpl<JsonObject> {
     
-    private JsonSchemaLocator scope;
     private final JsonArray types;
     
-    public JsonMultitypeSchemaWrapper(AbstractJsonSchemaElement parent, JsonSchemaLocator locator,
-            String jsonPointer, JsonArray types) {
-        super(parent, locator, jsonPointer);
+    public JsonMultitypeSchemaWrapper(AbstractJsonSchemaElement parent, 
+            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer,
+            JsonArray types) {
+        super(parent, scope, locator, jsonPointer);
         
         this.types = types;
     }
@@ -72,41 +70,15 @@ public class JsonMultitypeSchemaWrapper extends JsonAnyOfImpl<JsonObject> {
                 .filter(s -> s instanceof JsonObjectSchema || s instanceof JsonArraySchema)
                 .flatMap(JsonSchemaElement::getChildren);
     }
-
-    @Override
-    public JsonSchemaLocator getScope() {
-        return scope;
-    }
     
     @Override
     public JsonAnyOfImpl read(JsonSubschemaParser parser, JsonObject object)
             throws JsonSchemaException {
 
-        JsonValue $id = object.get(JsonSchema.ID);
-        if ($id == null) {
-            $id = object.get("id"); // draft4
-        } 
-
-        if ($id == null) {
-            scope = locator;
-        } else if ($id.getValueType() != JsonValue.ValueType.STRING) {
-                throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                    "id", $id.getValueType().name(), JsonValue.ValueType.STRING.name()));
-        } else {
-            final String id = ((JsonString)$id).getString();
-            try {
-                scope = locator.resolve(URI.create(id));
-                scope.setSchema(object);
-            } catch(IllegalArgumentException ex) {
-                throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_REFERENCE,
-                                              new Object[] {id}));
-            }
-        }
-
         if (types == null) {
             for (JsonType val : JsonType.values()) {
                 try {
-                    final AbstractJsonSchema s = parser.parse(locator, this, getJsonPointer(), object, val);
+                    final AbstractJsonSchema s = parser.parse(scope, this, getJsonPointer(), object, val);
                     if (s != null) {
                         add(s);
                     }
@@ -121,7 +93,7 @@ public class JsonMultitypeSchemaWrapper extends JsonAnyOfImpl<JsonObject> {
                 }
                 try {
                      final JsonType t = JsonType.fromValue(((JsonString)val).getString());
-                     add(parser.parse(locator, this, getJsonPointer(), object, t));
+                     add(parser.parse(scope, this, getJsonPointer(), object, t));
                 } catch(IllegalArgumentException ex) {
                     throw new JsonSchemaException(
                         new ParsingError(ParsingMessage.UNKNOWN_OBJECT_TYPE, val));

@@ -46,9 +46,9 @@ import java.net.URISyntaxException;
 public class JsonDynamicReferenceImpl extends JsonReferenceImpl
         implements JsonDynamicReference {
 
-    public JsonDynamicReferenceImpl(AbstractJsonSchemaElement parent, JsonSchemaLocator locator,
-            String jsonPointer) {
-        super(parent, locator, jsonPointer);
+    public JsonDynamicReferenceImpl(AbstractJsonSchemaElement parent, 
+            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
+        super(parent, scope, locator, jsonPointer);
     }
 
     @Override
@@ -93,12 +93,12 @@ public class JsonDynamicReferenceImpl extends JsonReferenceImpl
     private AbstractJsonSchemaElement getSchema(AbstractJsonSchemaElement e, URI uri)
             throws IOException, JsonSchemaException {
         final String fragment = uri.getFragment();
-        final JsonSchemaLocator scope = e.getScope().resolve(uri);
+        final JsonSchemaLocator scope = e.scope.resolve(uri);
         final JsonValue value = scope.getSchema("/");
         if (value instanceof JsonObject jsubschema) {
             final String anchor = jsubschema.getString(DYNAMIC_ANCHOR, null);
             if (fragment.equals(anchor)) {
-                return parser.parse(scope, e.getParent(), e.getJsonPointer(), jsubschema, null);
+                return parser.parse(scope, this, e.getJsonPointer(), jsubschema, null);
             }
         }
         return null;

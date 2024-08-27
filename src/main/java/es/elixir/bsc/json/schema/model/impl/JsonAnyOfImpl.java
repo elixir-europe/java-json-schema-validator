@@ -46,9 +46,9 @@ import jakarta.json.JsonValue;
 public class JsonAnyOfImpl<T extends JsonValue> extends SchemaArrayImpl<T>
                            implements JsonAnyOf<AbstractJsonSchema> {
     
-    public JsonAnyOfImpl(AbstractJsonSchemaElement parent, JsonSchemaLocator locator,
-            String jsonPointer) {
-        super(parent, locator, jsonPointer);
+    public JsonAnyOfImpl(AbstractJsonSchemaElement parent, 
+            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
+        super(parent, scope, locator, jsonPointer);
     }
     
     @Override

@@ -32,11 +32,11 @@ import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonRecursiveReference;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
+import es.elixir.bsc.json.schema.model.PrimitiveSchema;
 import java.util.stream.Stream;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
-import java.io.IOException;
 
 /**
  * @author Dmitry Repchevsky
@@ -45,9 +45,9 @@ import java.io.IOException;
 public class JsonRecursiveReferenceImpl extends AbstractJsonReferenceImpl
         implements JsonRecursiveReference {
     
-    public JsonRecursiveReferenceImpl(AbstractJsonSchemaElement parent, JsonSchemaLocator locator,
-            String jsonPointer) {
-        super(parent, locator, jsonPointer);
+    public JsonRecursiveReferenceImpl(AbstractJsonSchemaElement parent, 
+            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
+        super(parent, scope, locator, jsonPointer);
     }
 
     @Override
@@ -59,32 +59,27 @@ public class JsonRecursiveReferenceImpl extends AbstractJsonReferenceImpl
     public JsonSchemaElement getSchema() throws JsonSchemaException {
         if (schema == null) {
             AbstractJsonSchemaElement e = this;
-            try {
-                while ((e = e.getParent()) != null) {
-                    if ("/".equals(e.getJsonPointer())) {
-                        final JsonSchemaLocator scope = e.getScope();
-                        final JsonValue value = scope.getSchema("/");
-                        if (value instanceof JsonObject jsubschema) {
-                            final boolean anchor = jsubschema.getBoolean(RECURSIVE_ANCHOR, false);
-
-                            // no 'type' or 'type': [] leads to JsonMultitypeSchemaWrapper wrapper.
-                            // because we are in a 'root' parent either has different location
-                            // or be the wrapper.
-                            if (e.parent instanceof JsonMultitypeSchemaWrapper) {
-                                e = e.parent;
-                            }
-
-                            if (anchor) {
-                                schema = e;
-                                continue;
-                            } else if (schema == null) {
-                                schema = e;
-                            }
-                            break;
-                        }
+            while ((e = e.getParent()) != null) {
+                if (e instanceof PrimitiveSchema element &&
+                    "/".equals(e.getJsonPointer())) {
+                    final Boolean anchor = element.getRecursiveAnchor();
+                    
+                    // no 'type' or 'type': [] leads to JsonMultitypeSchemaWrapper wrapper.
+                    // because we are in a 'root' parent either has different location
+                    // or be the wrapper.
+                    if (e.parent instanceof JsonMultitypeSchemaWrapper) {
+                        e = e.parent;
                     }
+
+                    if (Boolean.TRUE == anchor) {
+                        schema = e;
+                        continue;
+                    } else if (schema == null) {
+                        schema = e;
+                    }
+                    break;
                 }
-            } catch (IOException ex) {}
+            }
         }
         
         return schema;

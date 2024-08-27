@@ -44,9 +44,9 @@ import jakarta.json.JsonArray;
 public class JsonAllOfImpl extends SchemaArrayImpl<JsonValue>
         implements JsonAllOf<AbstractJsonSchema> {
 
-    public JsonAllOfImpl(AbstractJsonSchema parent, JsonSchemaLocator locator,
-            String jsonPointer) {
-        super(parent, locator, jsonPointer);
+    public JsonAllOfImpl(AbstractJsonSchema parent, 
+            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
+        super(parent, scope, locator, jsonPointer);
     }
 
     @Override

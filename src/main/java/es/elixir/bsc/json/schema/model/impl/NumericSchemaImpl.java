@@ -54,9 +54,9 @@ public abstract class NumericSchemaImpl<T extends Number> extends PrimitiveSchem
     protected Number exclusiveMinimum;
     protected Number exclusiveMaximum;
     
-    public NumericSchemaImpl(AbstractJsonSchemaElement parent, JsonSchemaLocator locator,
-            String jsonPointer) {
-        super(parent, locator, jsonPointer);
+    public NumericSchemaImpl(AbstractJsonSchemaElement parent, 
+            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
+        super(parent, scope, locator, jsonPointer);
     }
 
     @Override

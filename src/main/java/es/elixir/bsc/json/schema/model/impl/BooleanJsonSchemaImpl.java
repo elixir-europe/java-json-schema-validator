@@ -50,9 +50,9 @@ public class BooleanJsonSchemaImpl extends AbstractJsonSchema<JsonValue>
 
     private boolean evaluation;
     
-    public BooleanJsonSchemaImpl(AbstractJsonSchemaElement parent, JsonSchemaLocator locator,
-            String jsonPointer) {
-        super(parent, locator, jsonPointer);
+    public BooleanJsonSchemaImpl(AbstractJsonSchemaElement parent, 
+            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
+        super(parent, scope, locator, jsonPointer);
     }
     
     @Override

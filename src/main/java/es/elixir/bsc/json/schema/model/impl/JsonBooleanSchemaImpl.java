@@ -43,9 +43,9 @@ import jakarta.json.JsonValue;
 public class JsonBooleanSchemaImpl extends PrimitiveSchemaImpl
                                    implements JsonBooleanSchema {
 
-    public JsonBooleanSchemaImpl(AbstractJsonSchemaElement parent, JsonSchemaLocator locator,
-            String jsonPointer) {
-        super(parent, locator, jsonPointer);
+    public JsonBooleanSchemaImpl(AbstractJsonSchemaElement parent, 
+            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
+        super(parent, scope, locator, jsonPointer);
     }
 
     @Override

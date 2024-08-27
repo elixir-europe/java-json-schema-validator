@@ -48,9 +48,9 @@ import jakarta.json.JsonValue;
 public abstract class AbstractJsonSchema<T extends JsonValue> 
         extends AbstractJsonSchemaElement implements JsonSchema {
     
-    public AbstractJsonSchema(AbstractJsonSchemaElement parent, JsonSchemaLocator locator, 
-            String jsonPointer) {
-        super(parent, locator, jsonPointer);
+    public AbstractJsonSchema(AbstractJsonSchemaElement parent, 
+            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
+        super(parent, scope, locator, jsonPointer);
     }
     
     public AbstractJsonSchema<T> read(JsonSubschemaParser parser, T value)
