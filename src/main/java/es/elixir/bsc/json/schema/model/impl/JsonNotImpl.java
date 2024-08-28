@@ -32,7 +32,6 @@ import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonNot;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -53,8 +52,8 @@ public class JsonNotImpl extends AbstractJsonSchema<JsonValue>
     }
     
     @Override
-    public <T extends JsonSchemaElement> Stream<T> getChildren() {
-        return schema.getChildren();
+    public Stream<AbstractJsonSchemaElement> getChildren() {
+        return schema.clone(schema).setParent(this).getChildren();
     }
     
     @Override

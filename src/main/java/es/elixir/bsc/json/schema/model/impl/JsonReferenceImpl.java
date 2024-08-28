@@ -31,7 +31,6 @@ import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonReference;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import java.io.IOException;
 import java.util.stream.Stream;
 import jakarta.json.JsonException;
@@ -50,28 +49,28 @@ public class JsonReferenceImpl extends AbstractJsonReferenceImpl implements Json
     }
 
     @Override
-    public <T extends JsonSchemaElement> Stream<T> getChildren() {
+    public Stream<AbstractJsonSchemaElement> getChildren() {
         if (schema == null) {
-            JsonSchemaElement s = getParent();
+            AbstractJsonSchemaElement s = getParent();
             while (s != null) {
                 if (ref_locator.uri.equals(s.getId()) &&
                     ref_pointer.equals(s.getJsonPointer())) {
-                    return Stream.of(); // cyclic ref
+                    return Stream.empty(); // cyclic ref
                 }
                 s = s.getParent();
             }
             try {
                 schema = getSchema();
             } catch(JsonSchemaException ex) {
-                return Stream.of(); // unresolvable ref
+                return Stream.empty(); // unresolvable ref
             }
         }
         
-        return schema.getChildren();
+        return schema.clone(schema).setParent(this).getChildren();
     }
 
     @Override
-    public JsonSchemaElement getSchema() throws JsonSchemaException {
+    public AbstractJsonSchemaElement getSchema() throws JsonSchemaException {
         if (schema == null) {
             try {
                 JsonValue jsubschema = ref_locator.getSchema(ref_pointer);

@@ -48,11 +48,16 @@ public class JsonRecursiveReferenceImpl extends AbstractJsonReferenceImpl
     public JsonRecursiveReferenceImpl(AbstractJsonSchemaElement parent, 
             JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
         super(parent, scope, locator, jsonPointer);
+
+        AbstractJsonSchemaElement e = this;
+        do {
+            e.setDynamicScope(true);
+        } while((e = e.getParent()) != null);
     }
 
     @Override
     public <T extends JsonSchemaElement> Stream<T> getChildren() {
-        return Stream.of(); // TODO
+        return Stream.empty(); // TODO
     }
 
     @Override
@@ -67,8 +72,8 @@ public class JsonRecursiveReferenceImpl extends AbstractJsonReferenceImpl
                     // no 'type' or 'type': [] leads to JsonMultitypeSchemaWrapper wrapper.
                     // because we are in a 'root' parent either has different location
                     // or be the wrapper.
-                    if (e.parent instanceof JsonMultitypeSchemaWrapper) {
-                        e = e.parent;
+                    if (e.getParent() instanceof JsonMultitypeSchemaWrapper) {
+                        e = e.getParent();
                     }
 
                     if (Boolean.TRUE == anchor) {

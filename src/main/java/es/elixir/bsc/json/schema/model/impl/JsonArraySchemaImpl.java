@@ -36,8 +36,10 @@ import es.elixir.bsc.json.schema.ParsingMessage;
 import java.util.ArrayList;
 import java.util.List;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -75,15 +77,19 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
     }
 
     @Override
-    public Stream<JsonSchemaElement> getChildren() {
-        final Stream stream = Stream.of(
+    public Stream<AbstractJsonSchemaElement> getChildren() {
+
+        // clone children and set their parent to 'this'
+        final Stream<AbstractJsonSchemaElement> children = Stream.concat(
+                Optional.ofNullable(items).map(Collection::stream).orElseGet(Stream::empty),
+                Stream.of(additionalItemsSchema, unevaluatedItemsSchema, contains)
+                        .filter(Objects::nonNull))
+                        .map(this::clone)
+                        .map(c -> c.setParent(this));
+                        
+        return Stream.concat(
                 super.getChildren(),
-                items != null ? items.stream() : null,
-                items != null ? items.stream().flatMap(JsonSchemaElement::getChildren) : null,
-                additionalItemsSchema != null ? additionalItemsSchema.getChildren() : null,
-                unevaluatedItemsSchema != null ? unevaluatedItemsSchema.getChildren() : null,
-                contains != null ? contains.getChildren() : null);
-        return stream.flatMap(c -> c);
+                children.flatMap(e -> Stream.concat(Stream.of(e), e.getChildren())));
     }
 
     @Override

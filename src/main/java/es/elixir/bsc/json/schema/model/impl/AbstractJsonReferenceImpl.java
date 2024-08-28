@@ -34,7 +34,6 @@ import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationException;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonReference;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import jakarta.json.JsonException;
 import java.util.List;
 import jakarta.json.JsonObject;
@@ -49,7 +48,7 @@ import java.net.URISyntaxException;
 public abstract class AbstractJsonReferenceImpl extends AbstractJsonSchema<JsonObject>
         implements JsonReference {
 
-    protected JsonSchemaElement schema;
+    protected AbstractJsonSchemaElement schema;
 
     protected URI ref;
     protected String ref_pointer;

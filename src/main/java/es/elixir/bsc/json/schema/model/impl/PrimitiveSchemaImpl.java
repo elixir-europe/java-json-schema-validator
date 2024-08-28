@@ -39,7 +39,6 @@ import es.elixir.bsc.json.schema.model.JsonDynamicReference;
 import es.elixir.bsc.json.schema.model.JsonRecursiveReference;
 import es.elixir.bsc.json.schema.model.JsonReference;
 import es.elixir.bsc.json.schema.model.JsonSchema;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import es.elixir.bsc.json.schema.model.PrimitiveSchema;
 import java.net.URI;
 import java.util.ArrayList;
@@ -49,6 +48,7 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Primitive empty Json Schema of any type ("object", "array", "string", etc.)
@@ -88,17 +88,15 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
     }
 
     @Override
-    public Stream<JsonSchemaElement> getChildren() {
-        return Stream.of(
-                allOf != null ? allOf.getChildren() : null,
-                anyOf != null ? anyOf.getChildren() : null,
-                oneOf != null ? oneOf.getChildren() : null,
-                not != null ? not.getChildren() : null,
-                _if != null ? _if.getChildren() : null,
-                _then != null ? _then.getChildren() : null,
-                _else != null ? _else.getChildren() : null,
-                ref != null ? ref.getChildren() : null)
-                .flatMap(c -> c);
+    public Stream<AbstractJsonSchemaElement> getChildren() {
+        // clone immediate children and set their parent to 'this'
+        final Stream<AbstractJsonSchemaElement> children =
+                Stream.of(allOf, anyOf, oneOf, not, _if, _then, _else, ref)
+                        .filter(Objects::nonNull)
+                        .map(this::clone)
+                        .map(c -> c.setParent(this));
+        
+        return children.flatMap(AbstractJsonSchemaElement::getChildren);
     }
     
     public String getTitle() {
