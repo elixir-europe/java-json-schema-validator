@@ -40,8 +40,6 @@ import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonDependentProperties;
-import static es.elixir.bsc.json.schema.model.JsonObjectSchema.PROPERTY_NAMES;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import es.elixir.bsc.json.schema.model.JsonType;
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -49,6 +47,7 @@ import javax.json.JsonObject;
 import javax.json.JsonValue;
 import javax.json.JsonValue.ValueType;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -82,15 +81,17 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
     }
 
     @Override
-    public Stream<JsonSchemaElement> getChildren() {
-        return Stream.of(
+    public Stream<AbstractJsonSchemaElement> getChildren() {
+        // clone immediate children and set their parent to 'this'
+        final Stream<AbstractJsonSchemaElement> children = Stream.of(
+                properties, propertyNames, patternProperties,
+                unevaluatedPropertiesSchema, dependentSchemas)
+                .filter(Objects::nonNull).map(this::clone)
+                .map(c -> c.setParent(this));
+
+        return Stream.concat(
                 super.getChildren(),
-                properties != null ? properties.getChildren() : null,
-                propertyNames != null ? propertyNames.getChildren() : null,
-                patternProperties != null ? patternProperties.getChildren() : null,
-                unevaluatedPropertiesSchema != null ? unevaluatedPropertiesSchema.getChildren() : null,
-                dependentSchemas != null ? dependentSchemas.getChildren() : null)
-                .flatMap(c -> c);
+                children.flatMap(AbstractJsonSchemaElement::getChildren));
     }
     
     @Override

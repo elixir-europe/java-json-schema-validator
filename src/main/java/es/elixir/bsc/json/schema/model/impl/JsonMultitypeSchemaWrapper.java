@@ -64,10 +64,12 @@ public class JsonMultitypeSchemaWrapper extends JsonAnyOfImpl<JsonObject> {
     }
 
     @Override
-    public Stream<JsonSchemaElement> getChildren() {
+    public Stream<AbstractJsonSchemaElement> getChildren() {
         return StreamSupport.stream(
                 Spliterators.spliteratorUnknownSize(iterator(), Spliterator.ORDERED),false)
                 .filter(s -> s instanceof JsonObjectSchema || s instanceof JsonArraySchema)
+                .map(this::clone)
+                .map(c -> c.setParent(this))
                 .flatMap(JsonSchemaElement::getChildren);
     }
     

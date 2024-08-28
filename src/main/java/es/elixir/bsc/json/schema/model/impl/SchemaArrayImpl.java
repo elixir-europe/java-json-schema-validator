@@ -30,7 +30,6 @@ import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.model.SchemaArray;
 import java.util.HashSet;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -57,11 +56,12 @@ public abstract class SchemaArrayImpl<T extends JsonValue>
     }
 
     @Override
-    public Stream<JsonSchemaElement> getChildren() {
-        final Stream stream = Stream.of(
-                schemas.stream(),
-                schemas.stream().flatMap(JsonSchemaElement::getChildren));
-        return stream.flatMap(c -> c);
+    public Stream<AbstractJsonSchemaElement> getChildren() {
+        // clone array schemas and set their parent to 'this'
+        final Stream<AbstractJsonSchemaElement> children =
+                schemas.stream().map(this::clone).map(c -> c.setParent(this));
+
+        return children.flatMap(e -> Stream.concat(Stream.of(e), e.getChildren()));
     }
 
     @Override

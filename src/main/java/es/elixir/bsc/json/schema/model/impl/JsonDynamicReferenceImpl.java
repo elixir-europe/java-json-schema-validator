@@ -31,7 +31,6 @@ import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonDynamicReference;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import java.util.stream.Stream;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
@@ -49,15 +48,20 @@ public class JsonDynamicReferenceImpl extends JsonReferenceImpl
     public JsonDynamicReferenceImpl(AbstractJsonSchemaElement parent, 
             JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
         super(parent, scope, locator, jsonPointer);
+        
+        AbstractJsonSchemaElement e = this;
+        do {
+            e.setDynamicScope(true);
+        } while((e = e.getParent()) != null);
     }
 
     @Override
-    public <T extends JsonSchemaElement> Stream<T> getChildren() {
-        return Stream.of(); // TODO
+    public Stream<AbstractJsonSchemaElement> getChildren() {
+        return Stream.empty(); // TODO
     }
 
     @Override
-    public JsonSchemaElement getSchema() throws JsonSchemaException {
+    public AbstractJsonSchemaElement getSchema() throws JsonSchemaException {
         if (schema == null) {
             final String fragment = ref.getFragment();
             if (fragment != null) {
@@ -71,7 +75,7 @@ public class JsonDynamicReferenceImpl extends JsonReferenceImpl
                     if (schema != null) {
                         final URI uri = new URI(null, null, fragment);
                         while ((e = e.getParent()) != null) {
-                            final JsonSchemaElement s = getSchema(e, uri);
+                            final AbstractJsonSchemaElement s = getSchema(e, uri);
                             if (s != null) {
                                 schema = s;
                             }
@@ -93,12 +97,12 @@ public class JsonDynamicReferenceImpl extends JsonReferenceImpl
     private AbstractJsonSchemaElement getSchema(AbstractJsonSchemaElement e, URI uri)
             throws IOException, JsonSchemaException {
         final String fragment = uri.getFragment();
-        final JsonSchemaLocator scope = e.scope.resolve(uri);
-        final JsonValue value = scope.getSchema("/");
+        final JsonSchemaLocator l = e.scope.resolve(uri);
+        final JsonValue value = l.getSchema("/");
         if (value instanceof JsonObject jsubschema) {
             final String anchor = jsubschema.getString(DYNAMIC_ANCHOR, null);
             if (fragment.equals(anchor)) {
-                return parser.parse(scope, this, e.getJsonPointer(), jsubschema, null);
+                return parser.parse(l, getParent(), e.getJsonPointer(), jsubschema, null);
             }
         }
         return null;

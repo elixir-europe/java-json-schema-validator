@@ -55,6 +55,7 @@ import es.elixir.bsc.json.schema.model.impl.JsonMultitypeSchemaWrapper;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
+import java.util.WeakHashMap;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonString;
@@ -68,6 +69,7 @@ import javax.json.JsonValue.ValueType;
 public class DefaultJsonSchemaParser implements JsonSubschemaParser {
     
     private final Map<String, Object> properties;
+    private final Map<AbstractJsonSchema, AbstractJsonSchema> cache = new WeakHashMap();
     
     public DefaultJsonSchemaParser(Map<String, Object> properties) {
         this.properties = properties;
@@ -163,8 +165,15 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
             case NULL: schema = new JsonNullSchemaImpl(parent, scope, locator, jsonPointer); break;
             default: return null;
         }
-
-        return schema.read(this, object);
+        
+        AbstractJsonSchema sch = cache.get(schema);
+        if (sch == null) {
+            sch = schema.read(this, object);
+            if (!sch.isDynamicScope()) {
+                cache.put(sch, sch);
+            }
+        }
+        return sch;
     }
     
     @Override
