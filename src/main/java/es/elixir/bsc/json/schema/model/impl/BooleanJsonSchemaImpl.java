@@ -57,7 +57,7 @@ public class BooleanJsonSchemaImpl extends AbstractJsonSchema<JsonValue>
     
     @Override
     public Stream<JsonSchemaElement> getChildren() {
-        return Stream.of();
+        return Stream.empty();
     }
 
     @Override

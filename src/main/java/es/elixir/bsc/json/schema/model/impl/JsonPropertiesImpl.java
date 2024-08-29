@@ -29,6 +29,7 @@ import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonProperties;
+import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -55,7 +56,7 @@ public class JsonPropertiesImpl extends AbstractJsonSchemaElement
     public Stream<AbstractJsonSchemaElement> getChildren() {
         // clone properties and set their parent to 'this'
         final Stream<AbstractJsonSchemaElement> children =
-                properties.values().stream().map(this::clone).map(c -> c.setParent(this));
+                properties.values().stream().map(c -> c.relink(this));
         
         return children.flatMap(p -> Stream.concat(Stream.of(p), p.getChildren()));
     }

@@ -93,8 +93,7 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
         final Stream<AbstractJsonSchemaElement> children =
                 Stream.of(allOf, anyOf, oneOf, not, _if, _then, _else, ref)
                         .filter(Objects::nonNull)
-                        .map(this::clone)
-                        .map(c -> c.setParent(this));
+                        .map(c -> c.relink(this));
         
         return children.flatMap(AbstractJsonSchemaElement::getChildren);
     }

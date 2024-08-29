@@ -53,7 +53,7 @@ public class JsonNotImpl extends AbstractJsonSchema<JsonValue>
     
     @Override
     public Stream<AbstractJsonSchemaElement> getChildren() {
-        return schema.clone(schema).setParent(this).getChildren();
+        return schema.relink(this).getChildren();
     }
     
     @Override

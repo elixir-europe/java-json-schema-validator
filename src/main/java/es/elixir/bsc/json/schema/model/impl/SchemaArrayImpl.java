@@ -59,7 +59,7 @@ public abstract class SchemaArrayImpl<T extends JsonValue>
     public Stream<AbstractJsonSchemaElement> getChildren() {
         // clone array schemas and set their parent to 'this'
         final Stream<AbstractJsonSchemaElement> children =
-                schemas.stream().map(this::clone).map(c -> c.setParent(this));
+                schemas.stream().map(c -> c.relink(this));
 
         return children.flatMap(e -> Stream.concat(Stream.of(e), e.getChildren()));
     }

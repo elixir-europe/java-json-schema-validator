@@ -48,7 +48,7 @@ public class JsonRecursiveReferenceImpl extends AbstractJsonReferenceImpl
     public JsonRecursiveReferenceImpl(AbstractJsonSchemaElement parent, 
             JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
         super(parent, scope, locator, jsonPointer);
-
+        
         AbstractJsonSchemaElement e = this;
         do {
             e.setDynamicScope(true);

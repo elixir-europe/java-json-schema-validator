@@ -55,18 +55,18 @@ public class JsonReferenceImpl extends AbstractJsonReferenceImpl implements Json
             while (s != null) {
                 if (ref_locator.uri.equals(s.getId()) &&
                     ref_pointer.equals(s.getJsonPointer())) {
-                    return Stream.empty(); // cyclic ref
+                    return Stream.of(); // cyclic ref
                 }
                 s = s.getParent();
             }
             try {
                 schema = getSchema();
             } catch(JsonSchemaException ex) {
-                return Stream.empty(); // unresolvable ref
+                return Stream.of(); // unresolvable ref
             }
         }
         
-        return schema.clone(schema).setParent(this).getChildren();
+        return schema.relink(this).getChildren();
     }
 
     @Override
@@ -79,7 +79,7 @@ public class JsonReferenceImpl extends AbstractJsonReferenceImpl implements Json
                             new ParsingError(ParsingMessage.UNRESOLVABLE_REFERENCE, ref));
                 }
 
-                schema = parser.parse(ref_locator, getParent(), ref_pointer, jsubschema, null);
+                schema = parser.parse(ref_locator, this, ref_pointer, jsubschema, null);
             } catch(IOException | JsonException | IllegalArgumentException ex) {
                 throw new JsonSchemaException(
                     new ParsingError(ParsingMessage.INVALID_REFERENCE, ref));
