@@ -86,8 +86,8 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
         final Stream<AbstractJsonSchemaElement> children = Stream.of(
                 properties, propertyNames, patternProperties,
                 unevaluatedPropertiesSchema, dependentSchemas)
-                .filter(Objects::nonNull).map(this::clone)
-                .map(c -> c.setParent(this));
+                .filter(Objects::nonNull)
+                .map(c -> c.relink(this));
 
         return Stream.concat(
                 super.getChildren(),

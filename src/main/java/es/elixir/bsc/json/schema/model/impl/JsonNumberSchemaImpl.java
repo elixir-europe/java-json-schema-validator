@@ -92,7 +92,7 @@ public class JsonNumberSchemaImpl extends NumericSchemaImpl<BigDecimal>
         
         return nerrors == errors.size();
     }
-    
+
     private void validate(String jsonPointer, BigDecimal dec, List<ValidationError> errors) {
 
         if (minimum != null) {

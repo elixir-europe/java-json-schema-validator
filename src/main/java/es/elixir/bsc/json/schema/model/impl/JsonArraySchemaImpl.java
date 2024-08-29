@@ -84,8 +84,7 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
                 Optional.ofNullable(items).map(Collection::stream).orElseGet(Stream::empty),
                 Stream.of(additionalItemsSchema, unevaluatedItemsSchema, contains)
                         .filter(Objects::nonNull))
-                        .map(this::clone)
-                        .map(c -> c.setParent(this));
+                        .map(c -> c.relink(this));
                         
         return Stream.concat(
                 super.getChildren(),

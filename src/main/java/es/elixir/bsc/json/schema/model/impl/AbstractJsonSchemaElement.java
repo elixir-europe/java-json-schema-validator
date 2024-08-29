@@ -84,6 +84,7 @@ public abstract class AbstractJsonSchemaElement
     public AbstractJsonSchemaElement getParent() {
         return parent;
     }
+    
 
     /**
      * This is a marker whether this element is in the dynamic scope and 
@@ -127,33 +128,22 @@ public abstract class AbstractJsonSchemaElement
     }
     
     /**
-     * Predicate to clone provided element.
-     * Method just omits possible (impossible) CloneNotSupportedException.
+     * Predicate to create a clone of this element linked another parent.
      * 
-     * @param <T> returned type inferred from caller
-     * @param element the element to be cloned
+     * @param parent - the parent to be assigned to the cloned element
      * 
-     * @return the clone of provided element
+     * @return the clone of this element
      */
-    protected <T extends AbstractJsonSchemaElement> T clone(T element) {
-        if (element != null) {
+    protected AbstractJsonSchemaElement relink(AbstractJsonSchemaElement parent) {
+        if (this.parent != parent) {
             try {
-                return (T)element.clone();
-            } catch (CloneNotSupportedException ex) {}
+                AbstractJsonSchemaElement e = (AbstractJsonSchemaElement)this.clone();
+                e.parent = parent;
+                return e;
+            } catch (CloneNotSupportedException ex) {
+                return null;
+            }
         }
-        return null;
-    }
-    
-    /**
-     * Predicate used in streams to replace parent for this element
-     * 
-     * @param parent new parent for this element
-     * 
-     * @return affected element (this)
-     */
-    protected AbstractJsonSchemaElement setParent(AbstractJsonSchemaElement parent) {
-        this.parent = parent;
         return this;
     }
-
 }

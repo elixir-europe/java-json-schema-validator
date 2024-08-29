@@ -31,6 +31,7 @@ import es.elixir.bsc.json.schema.JsonSchemaParser;
 import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.model.JsonDependentProperties;
+import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import es.elixir.bsc.json.schema.model.StringArray;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
@@ -55,8 +56,8 @@ public class JsonDependentPropertiesImpl extends AbstractJsonSchemaElement
     }
     
     @Override
-    public Stream<AbstractJsonSchemaElement> getChildren() {
-        return Stream.empty(); // TODO
+    public <T extends JsonSchemaElement> Stream<T> getChildren() {
+        return Stream.empty();
     }
 
     @Override

@@ -102,7 +102,7 @@ public class JsonDynamicReferenceImpl extends JsonReferenceImpl
         if (value instanceof JsonObject jsubschema) {
             final String anchor = jsubschema.getString(DYNAMIC_ANCHOR, null);
             if (fragment.equals(anchor)) {
-                return parser.parse(l, getParent(), e.getJsonPointer(), jsubschema, null);
+                return parser.parse(l, this, e.getJsonPointer(), jsubschema, null);
             }
         }
         return null;
