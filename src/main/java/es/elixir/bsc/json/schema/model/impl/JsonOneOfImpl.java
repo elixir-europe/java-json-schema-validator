@@ -45,8 +45,8 @@ public class JsonOneOfImpl extends SchemaArrayImpl<JsonValue>
                            implements JsonOneOf<AbstractJsonSchema> {
 
     public JsonOneOfImpl(AbstractJsonSchema parent, 
-            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
-        super(parent, scope, locator, jsonPointer);
+            JsonSchemaLocator locator, String jsonPointer) {
+        super(parent, locator, jsonPointer);
     }
 
     @Override

@@ -46,8 +46,8 @@ public class JsonNumberSchemaImpl extends NumericSchemaImpl<BigDecimal>
                                   implements JsonNumberSchema {
 
     public JsonNumberSchemaImpl(AbstractJsonSchemaElement parent, 
-            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
-        super(parent, scope, locator, jsonPointer);
+            JsonSchemaLocator locator, String jsonPointer) {
+        super(parent, locator, jsonPointer);
     }
 
     @Override

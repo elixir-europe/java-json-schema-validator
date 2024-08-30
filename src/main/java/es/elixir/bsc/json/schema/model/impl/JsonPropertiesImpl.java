@@ -29,7 +29,6 @@ import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonProperties;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -48,8 +47,8 @@ public class JsonPropertiesImpl extends AbstractJsonSchemaElement
     private final Map<String, AbstractJsonSchema> properties = new LinkedHashMap();
     
     public JsonPropertiesImpl(AbstractJsonSchema parent, 
-            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
-        super(parent, scope, locator, jsonPointer);
+            JsonSchemaLocator locator, String jsonPointer) {
+        super(parent, locator, jsonPointer);
     }
 
     @Override

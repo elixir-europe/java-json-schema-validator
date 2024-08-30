@@ -56,9 +56,9 @@ public class JsonMultitypeSchemaWrapper extends JsonAnyOfImpl<JsonObject> {
     private final JsonArray types;
     
     public JsonMultitypeSchemaWrapper(AbstractJsonSchemaElement parent, 
-            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer,
+            JsonSchemaLocator locator, String jsonPointer,
             JsonArray types) {
-        super(parent, scope, locator, jsonPointer);
+        super(parent, locator, jsonPointer);
         
         this.types = types;
     }
@@ -79,7 +79,7 @@ public class JsonMultitypeSchemaWrapper extends JsonAnyOfImpl<JsonObject> {
         if (types == null) {
             for (JsonType val : JsonType.values()) {
                 try {
-                    final AbstractJsonSchema s = parser.parse(scope, this, getJsonPointer(), object, val);
+                    final AbstractJsonSchema s = parser.parse(locator, this, getJsonPointer(), object, val);
                     if (s != null) {
                         add(s);
                     }
@@ -94,7 +94,7 @@ public class JsonMultitypeSchemaWrapper extends JsonAnyOfImpl<JsonObject> {
                 }
                 try {
                      final JsonType t = JsonType.fromValue(((JsonString)val).getString());
-                     add(parser.parse(scope, this, getJsonPointer(), object, t));
+                     add(parser.parse(locator, this, getJsonPointer(), object, t));
                 } catch(IllegalArgumentException ex) {
                     throw new JsonSchemaException(
                         new ParsingError(ParsingMessage.UNKNOWN_OBJECT_TYPE, val));

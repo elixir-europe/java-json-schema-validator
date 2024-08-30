@@ -44,8 +44,8 @@ public class JsonBooleanSchemaImpl extends PrimitiveSchemaImpl
                                    implements JsonBooleanSchema {
 
     public JsonBooleanSchemaImpl(AbstractJsonSchemaElement parent, 
-            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
-        super(parent, scope, locator, jsonPointer);
+            JsonSchemaLocator locator, String jsonPointer) {
+        super(parent, locator, jsonPointer);
     }
 
     @Override

@@ -45,8 +45,8 @@ public class JsonEnumImpl extends PrimitiveSchemaImpl implements JsonEnum {
     private List<JsonValue> values;
 
     public JsonEnumImpl(AbstractJsonSchemaElement parent, 
-            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
-        super(parent, scope, locator, jsonPointer);
+            JsonSchemaLocator locator, String jsonPointer) {
+        super(parent, locator, jsonPointer);
     }
 
     @Override

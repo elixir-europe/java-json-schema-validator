@@ -46,8 +46,8 @@ public class JsonDynamicReferenceImpl extends JsonReferenceImpl
         implements JsonDynamicReference {
 
     public JsonDynamicReferenceImpl(AbstractJsonSchemaElement parent, 
-            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
-        super(parent, scope, locator, jsonPointer);
+            JsonSchemaLocator locator, String jsonPointer) {
+        super(parent, locator, jsonPointer);
         
         AbstractJsonSchemaElement e = this;
         do {
@@ -97,7 +97,7 @@ public class JsonDynamicReferenceImpl extends JsonReferenceImpl
     private AbstractJsonSchemaElement getSchema(AbstractJsonSchemaElement e, URI uri)
             throws IOException, JsonSchemaException {
         final String fragment = uri.getFragment();
-        final JsonSchemaLocator l = e.scope.resolve(uri);
+        final JsonSchemaLocator l = e.locator.resolve(uri);
         final JsonValue value = l.getSchema("/");
         if (value instanceof JsonObject jsubschema) {
             final String anchor = jsubschema.getString(DYNAMIC_ANCHOR, null);

@@ -47,8 +47,8 @@ public class JsonNotImpl extends AbstractJsonSchema<JsonValue>
     private AbstractJsonSchema schema;
     
     public JsonNotImpl(AbstractJsonSchema parent, 
-            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
-        super(parent, scope, locator, jsonPointer);
+            JsonSchemaLocator locator, String jsonPointer) {
+        super(parent, locator, jsonPointer);
     }
     
     @Override
@@ -70,7 +70,7 @@ public class JsonNotImpl extends AbstractJsonSchema<JsonValue>
     public JsonNotImpl read(JsonSubschemaParser parser, JsonValue value)
             throws JsonSchemaException {
         
-        this.schema = parser.parse(scope, this, getJsonPointer(), value, null);
+        this.schema = parser.parse(locator, this, getJsonPointer(), value, null);
         return this;
     }
     

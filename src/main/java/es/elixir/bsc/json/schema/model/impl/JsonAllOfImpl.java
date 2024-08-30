@@ -45,8 +45,8 @@ public class JsonAllOfImpl extends SchemaArrayImpl<JsonValue>
         implements JsonAllOf<AbstractJsonSchema> {
 
     public JsonAllOfImpl(AbstractJsonSchema parent, 
-            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
-        super(parent, scope, locator, jsonPointer);
+            JsonSchemaLocator locator, String jsonPointer) {
+        super(parent, locator, jsonPointer);
     }
 
     @Override

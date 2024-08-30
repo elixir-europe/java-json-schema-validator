@@ -47,8 +47,8 @@ public class JsonAnyOfImpl<T extends JsonValue> extends SchemaArrayImpl<T>
                            implements JsonAnyOf<AbstractJsonSchema> {
     
     public JsonAnyOfImpl(AbstractJsonSchemaElement parent, 
-            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
-        super(parent, scope, locator, jsonPointer);
+            JsonSchemaLocator locator, String jsonPointer) {
+        super(parent, locator, jsonPointer);
     }
     
     @Override
