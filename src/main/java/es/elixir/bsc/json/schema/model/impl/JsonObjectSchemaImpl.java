@@ -76,8 +76,8 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
     private AbstractJsonSchema propertyNames;
 
     public JsonObjectSchemaImpl(AbstractJsonSchemaElement parent, 
-            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
-        super(parent, scope, locator, jsonPointer);
+            JsonSchemaLocator locator, String jsonPointer) {
+        super(parent, locator, jsonPointer);
     }
 
     @Override
@@ -121,7 +121,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
     public JsonProperties getDependentSchemas() {
         if (dependentSchemas == null) {
             dependentSchemas = new JsonPropertiesImpl(this, 
-                    scope, scope, jsonPointer + "/" + DEPENDENT_SCHEMAS);
+                    locator, jsonPointer + "/" + DEPENDENT_SCHEMAS);
         }
         return dependentSchemas;
     }
@@ -130,7 +130,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
     public JsonDependentProperties getDependentRequired() {
         if (dependentRequired == null) {
             dependentRequired = new JsonDependentPropertiesImpl(this, 
-                    scope, scope, jsonPointer + "/" + DEPENDENT_REQUIRED);
+                    locator, jsonPointer + "/" + DEPENDENT_REQUIRED);
         }
         return dependentRequired;
     }
@@ -173,7 +173,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
         
         final JsonObject jproperties = JsonSchemaUtil.check(object.get(PROPERTIES), ValueType.OBJECT);
         if (jproperties != null) {
-            properties = new JsonPropertiesImpl(this, scope, scope, jsonPointer + "/" + PROPERTIES)
+            properties = new JsonPropertiesImpl(this, locator, jsonPointer + "/" + PROPERTIES)
                     .read(parser, jproperties);
         }
 
@@ -189,7 +189,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
 
         final JsonObject jpatternProperties = JsonSchemaUtil.check(object.get(PATTERN_PROPERTIES), ValueType.OBJECT);
         if (jpatternProperties != null) {
-            patternProperties = new JsonPropertiesImpl(this, scope, scope, jsonPointer + "/" + PATTERN_PROPERTIES)
+            patternProperties = new JsonPropertiesImpl(this, locator, jsonPointer + "/" + PATTERN_PROPERTIES)
                     .read(parser, jpatternProperties);
         }
         
@@ -201,7 +201,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
         final JsonValue jadditionalProperties = object.get(ADDITIONAL_PROPERTIES);
         if (jadditionalProperties != null) {
             switch(jadditionalProperties.getValueType()) {
-                case OBJECT: additionalPropertiesSchema = parser.parse(scope, this, getJsonPointer() + "/" + ADDITIONAL_PROPERTIES, jadditionalProperties, null); break;
+                case OBJECT: additionalPropertiesSchema = parser.parse(locator, this, getJsonPointer() + "/" + ADDITIONAL_PROPERTIES, jadditionalProperties, null); break;
                 case TRUE:   additionalProperties = true; break;
                 case FALSE:  additionalProperties = false; break;
                 default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
@@ -212,7 +212,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
         final JsonValue junevaluatedProperties = object.get(UNEVALUATED_PROPERTIES);
         if (junevaluatedProperties != null) {
             switch(junevaluatedProperties.getValueType()) {
-                case OBJECT: unevaluatedPropertiesSchema = parser.parse(scope, this, getJsonPointer() + "/" + UNEVALUATED_PROPERTIES, junevaluatedProperties, null); break;
+                case OBJECT: unevaluatedPropertiesSchema = parser.parse(locator, this, getJsonPointer() + "/" + UNEVALUATED_PROPERTIES, junevaluatedProperties, null); break;
                 case TRUE:   unevaluatedProperties = true; break;
                 case FALSE:  unevaluatedProperties = false; break;
                 default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
@@ -222,18 +222,18 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
 
         final JsonValue jpropertyNames = object.get(PROPERTY_NAMES);
         if (jpropertyNames != null) {
-            propertyNames = parser.parse(scope, this, getJsonPointer() + "/" + PROPERTY_NAMES, jpropertyNames, JsonType.STRING);
+            propertyNames = parser.parse(locator, this, getJsonPointer() + "/" + PROPERTY_NAMES, jpropertyNames, JsonType.STRING);
         }
         
         final JsonObject jdependentSchemas = JsonSchemaUtil.check(object.get(DEPENDENT_SCHEMAS), ValueType.OBJECT);
         if (jdependentSchemas != null) {
-            dependentSchemas = new JsonPropertiesImpl(this, scope, scope, 
+            dependentSchemas = new JsonPropertiesImpl(this, locator, 
                     jsonPointer + "/" + DEPENDENT_SCHEMAS).read(parser, jdependentSchemas);
         }
 
         final JsonObject jdependentRequired = JsonSchemaUtil.check(object.get(DEPENDENT_REQUIRED), ValueType.OBJECT);
         if (jdependentRequired != null) {
-            dependentRequired = new JsonDependentPropertiesImpl(this, scope, scope, 
+            dependentRequired = new JsonDependentPropertiesImpl(this, locator, 
                     jsonPointer + "/" + DEPENDENT_REQUIRED).read(parser, jdependentRequired);
         }
         
@@ -246,7 +246,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
                 switch(value.getValueType()) {
                     case OBJECT:
                     case TRUE:
-                    case FALSE:  final AbstractJsonSchema schema = parser.parse(scope, this, getJsonPointer() + "/" + DEPENDENCIES + "/" + name + "/", value, null);
+                    case FALSE:  final AbstractJsonSchema schema = parser.parse(locator, this, getJsonPointer() + "/" + DEPENDENCIES + "/" + name + "/", value, null);
                                  getDependentSchemas().put(name, schema);
                                  break;
                     case ARRAY:  final StringArray arr = new JsonStringArray().read(value.asJsonArray());

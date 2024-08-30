@@ -55,8 +55,8 @@ public class JsonStringSchemaImpl extends PrimitiveSchemaImpl
     private Pattern pattern;
 
     public JsonStringSchemaImpl(AbstractJsonSchemaElement parent, 
-            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
-        super(parent, scope, locator, jsonPointer);
+            JsonSchemaLocator locator, String jsonPointer) {
+        super(parent, locator, jsonPointer);
     }
     
     @Override

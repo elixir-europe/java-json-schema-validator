@@ -46,8 +46,8 @@ public class JsonConstImpl extends PrimitiveSchemaImpl implements JsonConst {
     private JsonValue value;
 
     public JsonConstImpl(AbstractJsonSchemaElement parent, 
-            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
-        super(parent, scope, locator, jsonPointer);
+            JsonSchemaLocator locator, String jsonPointer) {
+        super(parent, locator, jsonPointer);
     }
 
     @Override

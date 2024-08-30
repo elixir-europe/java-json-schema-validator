@@ -44,8 +44,8 @@ public class JsonNullSchemaImpl extends PrimitiveSchemaImpl
                                 implements JsonNullSchema {
 
     public JsonNullSchemaImpl(AbstractJsonSchemaElement parent, 
-            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
-        super(parent, scope, locator, jsonPointer);
+            JsonSchemaLocator locator, String jsonPointer) {
+        super(parent, locator, jsonPointer);
     }
 
     @Override

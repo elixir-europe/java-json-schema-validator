@@ -44,8 +44,8 @@ import jakarta.json.JsonValue;
 public class JsonReferenceImpl extends AbstractJsonReferenceImpl implements JsonReference {
     
     public JsonReferenceImpl(AbstractJsonSchemaElement parent, 
-            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
-        super(parent, scope, locator, jsonPointer);
+            JsonSchemaLocator locator, String jsonPointer) {
+        super(parent, locator, jsonPointer);
     }
 
     @Override

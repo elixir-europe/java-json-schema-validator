@@ -43,7 +43,6 @@ public abstract class AbstractJsonSchemaElement
     
     private AbstractJsonSchemaElement parent;
     
-    public final JsonSchemaLocator scope;
     public final JsonSchemaLocator locator;
     public final String jsonPointer;
     
@@ -55,29 +54,26 @@ public abstract class AbstractJsonSchemaElement
      * the JSON Schema.
      * 
      * @param parent a parent element that encloses this one
-     * @param scope current element scope (may or may not be equal to the location)
-     * @param locator the locator that was used to load this document
+     * @param locator current element scope (may or may not be equal to the location)
      * @param jsonPointer JSON Pointer to the parsed JSON Value that represents this element.
      */
     public AbstractJsonSchemaElement(AbstractJsonSchemaElement parent, 
-            JsonSchemaLocator scope, JsonSchemaLocator locator, String jsonPointer) {
+            JsonSchemaLocator locator, String jsonPointer) {
 
         this.parent = parent;
 
-        this.scope = scope;
         this.locator = locator;
         this.jsonPointer = jsonPointer.startsWith("//") ? jsonPointer.substring(1) : jsonPointer;
     }
 
     @Override
     public final URI getId() {
-        return scope.uri;
+        return locator.uri;
     }
 
     @Override
     public String getJsonPointer() {
-        // when scope != locator (new scope) jsonPointer is 'root'
-        return scope == locator ? jsonPointer : "/";
+        return parent == null || parent.locator != locator ? "/" : jsonPointer;
     }
 
     @Override
@@ -108,7 +104,7 @@ public abstract class AbstractJsonSchemaElement
         if (obj instanceof AbstractJsonSchemaElement other &&
             this.getClass() == obj.getClass()) {
             return Objects.equals(jsonPointer, other.jsonPointer) &&
-                   Objects.equals(scope.uri, other.scope.uri);
+                   Objects.equals(locator.uri, other.locator.uri);
         }
         return false;
     }
@@ -116,7 +112,7 @@ public abstract class AbstractJsonSchemaElement
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 31 * hash + Objects.hashCode(this.scope.uri);
+        hash = 31 * hash + Objects.hashCode(this.locator.uri);
         hash = 31 * hash + Objects.hashCode(this.jsonPointer);
         hash = 31 * hash + Objects.hashCode(this.getClass().hashCode());
         return hash;
