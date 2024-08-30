@@ -56,7 +56,11 @@ import javax.json.JsonValue;
 public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
                                  implements JsonArraySchema {
 
-    private List<AbstractJsonSchema> items;
+    private final List<AbstractJsonSchema> items;
+    
+    // the items are actually a 'prefixItems'
+    private boolean prefixItems;
+    
     private Boolean additionalItems;
     private Boolean uniqueItems;
     private AbstractJsonSchema additionalItemsSchema;
@@ -74,6 +78,8 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
     public JsonArraySchemaImpl(AbstractJsonSchemaElement parent, 
             JsonSchemaLocator locator, String jsonPointer) {
         super(parent, locator, jsonPointer);
+        
+        items = new ArrayList();
     }
 
     @Override
@@ -93,11 +99,15 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
 
     @Override
     public List<AbstractJsonSchema> getItems() {
-        if (items == null) {
-            items = new ArrayList<>();
-        }
-        
-        return items;
+        // in 2020-12 'items' is a schema
+        return prefixItems ? additionalItemsSchema != null ? List.of(additionalItemsSchema) : null : items;
+    }
+
+    @Override
+    public List<AbstractJsonSchema> getPrefixItems() {
+        // 2019-09 'items' == 2020-12 'prefixItems'
+        // 2019-09 'additionalItemsSchema' == 2020-12 'items'
+        return prefixItems ? items : null;
     }
 
     @Override
@@ -155,7 +165,7 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
             throws JsonSchemaException {
 
         super.read(parser, object);
-        
+
         final JsonNumber min = JsonSchemaUtil.check(object.getJsonNumber(MIN_ITEMS), JsonValue.ValueType.NUMBER);
         if (min != null) {
             minItems = min.longValue();
@@ -192,45 +202,57 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
         }
 
         JsonValue jitems = object.get(ITEMS);
-        if (jitems != null) {
+        JsonValue jadditionalItems = object.get(ADDITIONAL_ITEMS);
+        
+        JsonArray jprefixitems = JsonSchemaUtil.check(object.get(PREFIX_ITEMS), JsonValue.ValueType.ARRAY);
+        if (jprefixitems != null) {
+            // in 2020-12 when 'prefixItems' is defined 'items' are 'additionalItems'
+            prefixItems = true;
+            jadditionalItems = jitems;
+        } else if (jitems != null) {
             switch(jitems.getValueType()) {
                 case OBJECT:
                 case TRUE:
                 case FALSE: final AbstractJsonSchema schema = parser.parse(locator, this, getJsonPointer() + "/" + ITEMS, jitems, null);
-                            getItems().add(schema);
+                            items.add(schema);
                             break;
-                case ARRAY: additionalItems = true;
-                            for (int i = 0, n = jitems.asJsonArray().size(); i < n; i++) {
-                                final JsonValue value = jitems.asJsonArray().get(i);
-                                switch(value.getValueType()) {
-                                    case OBJECT:
-                                    case TRUE:
-                                    case FALSE: final AbstractJsonSchema arr = parser.parse(locator, this, getJsonPointer() + "/" + ITEMS + "/" + i, value, null);
-                                                getItems().add(arr);
-                                                break;
-                                    default: throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                                                 ITEMS + "/" + i, value.getValueType().name(), "either an object or boolean"));
-                                }
-                            }
+                case ARRAY: jprefixitems = jitems.asJsonArray();
                             break;
                 default: throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
                                 ITEMS, jitems.getValueType().name(), "either an object, boolean or an array"));
-
+            }
+        }
+        
+        if (jprefixitems != null) {
+            additionalItems = true;
+            
+            final String propertyName = prefixItems ? PREFIX_ITEMS : ITEMS;
+            
+            for (int i = 0, n = jprefixitems.size(); i < n; i++) {
+                final JsonValue value = jprefixitems.get(i);
+                switch(value.getValueType()) {
+                    case OBJECT:
+                    case TRUE:
+                    case FALSE: final AbstractJsonSchema arr = parser.parse(locator, this, getJsonPointer() + "/" + propertyName + "/" + i, value, null);
+                                items.add(arr);
+                                break;
+                    default: throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
+                                 propertyName + "/" + i, value.getValueType().name(), "either an object or boolean"));
+                }
             }
         }
 
-        if (additionalItems != null) {
-            final JsonValue jadditionalItems = object.get(ADDITIONAL_ITEMS);
-            if (jadditionalItems != null) {
-                switch(jadditionalItems.getValueType()) {
-                    case OBJECT: additionalItems = null; break;
-                    case FALSE:  additionalItems = false;
-                    case TRUE:   break;
-                    default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                                            ADDITIONAL_ITEMS, jadditionalItems.getValueType().name(), "either object or boolean"));
-                }
-                additionalItemsSchema = parser.parse(locator, this, getJsonPointer() + "/" + ADDITIONAL_ITEMS, jadditionalItems, null);
+        if (additionalItems != null && jadditionalItems != null) {
+            final String propertyName = jadditionalItems == jitems ? ITEMS : ADDITIONAL_ITEMS;
+            
+            switch(jadditionalItems.getValueType()) {
+                case OBJECT: break;
+                case FALSE: additionalItems = false;
+                case TRUE: break;
+                default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
+                                        propertyName, jadditionalItems.getValueType().name(), "either object or boolean"));
             }
+            additionalItemsSchema = parser.parse(locator, this, getJsonPointer() + "/" + propertyName, jadditionalItems, null);
         }
 
         final JsonValue junevaluatedItems = object.get(UNEVALUATED_ITEMS);
