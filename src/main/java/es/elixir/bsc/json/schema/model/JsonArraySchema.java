@@ -36,6 +36,7 @@ import java.util.List;
 public interface JsonArraySchema extends JsonSchema {
     
     public final static String ITEMS = "items";
+    public final static String PREFIX_ITEMS = "prefixItems";
     public final static String UNIQUE_ITEMS = "uniqueItems";
     public final static String ADDITIONAL_ITEMS = "additionalItems";
     public final static String UNEVALUATED_ITEMS = "unevaluatedItems";
@@ -54,19 +55,33 @@ public interface JsonArraySchema extends JsonSchema {
     void setMaxItems(Long maxItems);
 
     /**
+     * returns a list that contain one or more schemas.
+     * 
+     * In 2020-12 returns immutable list with just one schema.
+     * In 2019-09 and before the list may contain more schemas.
+     * 
      * In a case where there is only one schema in the list it is 
-     * either {...} or [{...}].Setting 'additionalItems' to <b>NULL</b> 
-     * means there is a single schema and not an array with only one schema defined.
-     *
-     * @param <T>
+     * either {...} or [{...}].
+     * 
+     * @param <T> any implementation specific class that implements JsonSchema
      * 
      * @return list of schemas
      */
     <T extends JsonSchema> List<T> getItems();
     
+    /**
+     * Returns 2020-12 'prefixItems' 
+     * 
+     * @param <T> any implementation specific class that implements JsonSchema
+     * @return 
+     */
+    <T extends JsonSchema> List<T> getPrefixItems();
+    
     Boolean isUniqueItems();
 
     /**
+     * Returns 'additionalSchema' or 'items' in the 2020-09
+     * 
      * @param <T>
      * 
      * @return 'additionalSchema' JsonSchema, <b>NULL</b> if FALSE (or not set), 
