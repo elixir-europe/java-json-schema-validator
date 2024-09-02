@@ -203,7 +203,6 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
 
         JsonValue jitems = object.get(ITEMS);
         JsonValue jadditionalItems = object.get(ADDITIONAL_ITEMS);
-        
         JsonArray jprefixitems = JsonSchemaUtil.check(object.get(PREFIX_ITEMS), JsonValue.ValueType.ARRAY);
         if (jprefixitems != null) {
             // in 2020-12 when 'prefixItems' is defined 'items' are 'additionalItems'
@@ -243,7 +242,7 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
         }
 
         if (additionalItems != null && jadditionalItems != null) {
-            final String propertyName = jadditionalItems == jitems ? ITEMS : ADDITIONAL_ITEMS;
+            final String propertyName = prefixItems ? ITEMS : ADDITIONAL_ITEMS;
             
             switch(jadditionalItems.getValueType()) {
                 case OBJECT: break;
@@ -296,6 +295,38 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
         if (maxItems != null && array.size() > maxItems) {
             errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
                     ValidationMessage.ARRAY_MAX_ITEMS_CONSTRAINT_MSG, maxItems, items == null ? 0 : items.size()));
+        }
+
+        if (contains != null) {
+            final List eva = new ArrayList();
+            final List<ValidationError> err = new ArrayList<>();
+            int cnt = 0;
+            for (int i = 0, n = array.size(); i < n; i++) {
+                final JsonValue val = array.get(i);
+                if (contains.validate(jsonPointer, val, parent, eva, err, callback)) {
+                    evaluated.add(i);
+                    cnt++;
+                }
+            }
+            
+            if (cnt == 0) {
+                if (minContains == null) {
+                    errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                        ValidationMessage.ARRAY_CONTAINS_CONSTRAINT_MSG));                    
+                } else if (minContains > 0) {
+                    errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                        ValidationMessage.ARRAY_MIN_CONTAINS_CONSTRAINT_MSG, cnt, minContains));                    
+                }
+            } else {
+                if (minContains != null && cnt < minContains) {
+                    errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                        ValidationMessage.ARRAY_MIN_CONTAINS_CONSTRAINT_MSG, cnt, minContains));                    
+                }
+                if (maxContains != null && cnt > maxContains) {
+                    errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                        ValidationMessage.ARRAY_MAX_CONTAINS_CONSTRAINT_MSG, cnt, maxContains));                    
+                }
+            }
         }
 
         if (items != null) {
@@ -395,37 +426,6 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
                             ValidationMessage.ARRAY_UNIQUE_ITEMS_CONSTRAINT_MSG, val.toString()));
                 } else {
                     values.add(o);
-                }
-            }
-        }
-
-        if (contains != null) {
-            final List eva = new ArrayList();
-            final List<ValidationError> err = new ArrayList<>();
-            int cnt = 0;
-            for (int i = 0, n = array.size(); i < n; i++) {
-                final JsonValue val = array.get(i);
-                if (contains.validate(jsonPointer, val, parent, eva, err, callback)) {
-                    cnt++;
-                }
-            }
-            
-            if (cnt == 0) {
-                if (minContains == null) {
-                    errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
-                        ValidationMessage.ARRAY_CONTAINS_CONSTRAINT_MSG));                    
-                } else if (minContains > 0) {
-                    errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
-                        ValidationMessage.ARRAY_MIN_CONTAINS_CONSTRAINT_MSG, cnt, minContains));                    
-                }
-            } else {
-                if (minContains != null && cnt < minContains) {
-                    errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
-                        ValidationMessage.ARRAY_MIN_CONTAINS_CONSTRAINT_MSG, cnt, minContains));                    
-                }
-                if (maxContains != null && cnt > maxContains) {
-                    errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
-                        ValidationMessage.ARRAY_MAX_CONTAINS_CONSTRAINT_MSG, cnt, maxContains));                    
                 }
             }
         }
