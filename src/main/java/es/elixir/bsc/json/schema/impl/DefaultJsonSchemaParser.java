@@ -110,26 +110,6 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
             }
         }
         
-        JsonValue $id = object.get(JsonSchema.ID);
-        if ($id == null) {
-            $id = object.get("id"); // draft4
-        } 
-
-        if ($id != null) {
-            if ($id.getValueType() != JsonValue.ValueType.STRING) {
-                throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                    "id", $id.getValueType().name(), JsonValue.ValueType.STRING.name()));
-            } else {
-                final String id = ((JsonString)$id).getString();
-                try {
-                    locator = locator.resolve(URI.create(id));
-                    locator.setSchema(object);
-                } catch(IllegalArgumentException ex) {
-                    throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_REFERENCE, id));
-                }
-            }
-        }
-        
         final JsonValue type_value = object.get(TYPE);
         final ValueType vtype;
         if (type_value == null) {
@@ -152,6 +132,32 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
                             "either a string or an array"));
             }
         }
+
+        if (type == null) {
+            return new JsonMultitypeSchemaWrapper(parent, locator, jsonPointer, 
+                    vtype == ValueType.ARRAY ? type_value.asJsonArray() : null)
+                    .read(this, object);
+        }
+        
+        JsonValue $id = object.get(JsonSchema.ID);
+        if ($id == null) {
+            $id = object.get("id"); // draft4
+        } 
+
+        if ($id != null) {
+            if ($id.getValueType() != JsonValue.ValueType.STRING) {
+                throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
+                    "id", $id.getValueType().name(), JsonValue.ValueType.STRING.name()));
+            } else {
+                final String id = ((JsonString)$id).getString();
+                try {
+                    locator = locator.resolve(URI.create(id));
+                    locator.setSchema(object);
+                } catch(IllegalArgumentException ex) {
+                    throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_REFERENCE, id));
+                }
+            }
+        }
         
         final JsonArray jenum = JsonSchemaUtil.check(object.get(ENUM), JsonValue.ValueType.ARRAY);
         if (jenum != null) {
@@ -164,12 +170,6 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
         final JsonValue jconst = object.get(CONST);
         if (jconst != null) {
             return new JsonConstImpl(parent, locator, jsonPointer).read(this, object);
-        }
-
-        if (type == null) {
-            return new JsonMultitypeSchemaWrapper(parent, locator, jsonPointer, 
-                    vtype == ValueType.ARRAY ? type_value.asJsonArray() : null)
-                    .read(this, object);
         }
 
         final AbstractJsonSchema schema;

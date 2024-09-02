@@ -60,8 +60,8 @@ public class JsonSchemaRefTest extends JsonSchemaOrgTest {
         test(JSON_DRAFT201909_TEST_FILE, JsonSchemaVersion.SCHEMA_DRAFT_2019_09);
     }
     
-//    @Test
-//    public void test_draft202012() {
-//        test(JSON_DRAFT202012_TEST_FILE, JsonSchemaVersion.SCHEMA_DRAFT_2020_12);
-//    }
+    @Test
+    public void test_draft202012() {
+        test(JSON_DRAFT202012_TEST_FILE, JsonSchemaVersion.SCHEMA_DRAFT_2020_12);
+    }
 }

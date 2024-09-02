@@ -52,9 +52,9 @@
     {
         "description": "base URI change",
         "schema": {
-            "$id": "http://localhost:1234/",
+            "id": "http://localhost:1234/",
             "items": {
-                "$id": "baseUriChange/",
+                "id": "baseUriChange/",
                 "items": {"$ref": "folderInteger.json"}
             }
         },
@@ -74,14 +74,14 @@
     {
         "description": "base URI change - change folder",
         "schema": {
-            "$id": "http://localhost:1234/scope_change_defs1.json",
+            "id": "http://localhost:1234/scope_change_defs1.json",
             "type" : "object",
             "properties": {
                 "list": {"$ref": "#/definitions/baz"}
             },
             "definitions": {
                 "baz": {
-                    "$id": "baseUriChangeFolder/",
+                    "id": "baseUriChangeFolder/",
                     "type": "array",
                     "items": {"$ref": "folderInteger.json"}
                 }
@@ -103,14 +103,14 @@
     {
         "description": "base URI change - change folder in subschema",
         "schema": {
-            "$id": "http://localhost:1234/scope_change_defs2.json",
+            "id": "http://localhost:1234/scope_change_defs2.json",
             "type" : "object",
             "properties": {
                 "list": {"$ref": "#/definitions/baz/definitions/bar"}
             },
             "definitions": {
                 "baz": {
-                    "$id": "baseUriChangeFolderInSubschema/",
+                    "id": "baseUriChangeFolderInSubschema/",
                     "definitions": {
                         "bar": {
                             "type": "array",
@@ -136,7 +136,7 @@
     {
         "description": "root ref in remote ref",
         "schema": {
-            "$id": "http://localhost:1234/object",
+            "id": "http://localhost:1234/object",
             "type": "object",
             "properties": {
                 "name": {"$ref": "name.json#/definitions/orNull"}
@@ -169,34 +169,9 @@
         ]
     },
     {
-        "description": "remote ref with ref to definitions",
-        "schema": {
-            "$id": "http://localhost:1234/schema-remote-ref-ref-defs1.json",
-            "allOf": [
-                { "$ref": "ref-and-definitions.json" }
-            ]
-        },
-        "tests": [
-            {
-                "description": "invalid",
-                "data": {
-                    "bar": 1
-                },
-                "valid": false
-            },
-            {
-                "description": "valid",
-                "data": {
-                    "bar": "a"
-                },
-                "valid": true
-            }
-        ]
-    },
-    {
         "description": "Location-independent identifier in remote ref",
         "schema": {
-            "$ref": "http://localhost:1234/locationIndependentIdentifierPre2019.json#/definitions/refToInteger"
+            "$ref": "http://localhost:1234/locationIndependentIdentifierDraft4.json#/definitions/refToInteger"
         },
         "tests": [
             {
@@ -207,49 +182,6 @@
             {
                 "description": "string is invalid",
                 "data": "foo",
-                "valid": false
-            }
-        ]
-    },
-    {
-        "description": "retrieved nested refs resolve relative to their URI not $id",
-        "schema": {
-            "$id": "http://localhost:1234/some-id",
-            "properties": {
-                "name": {"$ref": "nested/foo-ref-string.json"}
-            }
-        },
-        "tests": [
-            {
-                "description": "number is invalid",
-                "data": {
-                    "name": {"foo":  1}
-                },
-                "valid": false
-            },
-            {
-                "description": "string is valid",
-                "data": {
-                    "name": {"foo":  "a"}
-                },
-                "valid": true
-            }
-        ]
-    },
-    {
-        "description": "$ref to $ref finds location-independent $id",
-        "schema": {
-            "$ref": "http://localhost:1234/draft7/detached-ref.json#/definitions/foo"
-        },
-        "tests": [
-            {
-                "description": "number is valid",
-                "data": 1,
-                "valid": true
-            },
-            {
-                "description": "non-number is invalid",
-                "data": "a",
                 "valid": false
             }
         ]
