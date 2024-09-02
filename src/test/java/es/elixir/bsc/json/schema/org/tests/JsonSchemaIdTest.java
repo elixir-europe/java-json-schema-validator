@@ -59,8 +59,8 @@ public class JsonSchemaIdTest extends JsonSchemaOrgTest {
         test(JSON_DRAFT201909_TEST_FILE);
     }
     
-//    @Test
-//    public void test_draft202012() {
-//        test(JSON_DRAFT202012_TEST_FILE);
-//    }
+    @Test
+    public void test_draft202012() {
+        test(JSON_DRAFT202012_TEST_FILE);
+    }
 }

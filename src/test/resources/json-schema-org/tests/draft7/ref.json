@@ -446,6 +446,33 @@
         ]
     },
     {
+        "description": "Reference an anchor with a non-relative URI",
+        "schema": {
+            "$id": "https://example.com/schema-with-anchor",
+            "allOf": [{
+                "$ref": "https://example.com/schema-with-anchor#foo"
+            }],
+            "definitions": {
+                "A": {
+                    "$id": "#foo",
+                    "type": "integer"
+                }
+            }
+        },
+        "tests": [
+            {
+                "data": 1,
+                "description": "match",
+                "valid": true
+            },
+            {
+                "data": "a",
+                "description": "mismatch",
+                "valid": false
+            }
+        ]
+    },
+    {
         "description": "Location-independent identifier with base URI change in subschema",
         "schema": {
             "$id": "http://localhost:1234/root",
@@ -815,6 +842,200 @@
             {
                 "description": "a non-string is invalid",
                 "data": {"foo": 12},
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "ref to if",
+        "schema": {
+            "allOf": [
+                {"$ref": "http://example.com/ref/if"},
+                {
+                    "if": {
+                        "$id": "http://example.com/ref/if",
+                        "type": "integer"
+                    }
+                }
+            ]
+        },
+        "tests": [
+            {
+                "description": "a non-integer is invalid due to the $ref",
+                "data": "foo",
+                "valid": false
+            },
+            {
+                "description": "an integer is valid",
+                "data": 12,
+                "valid": true
+            }
+        ]
+    },
+    {
+        "description": "ref to then",
+        "schema": {
+            "allOf": [
+                {"$ref": "http://example.com/ref/then"},
+                {
+                    "then": {
+                        "$id": "http://example.com/ref/then",
+                        "type": "integer"
+                    }
+                }
+            ]
+        },
+        "tests": [
+            {
+                "description": "a non-integer is invalid due to the $ref",
+                "data": "foo",
+                "valid": false
+            },
+            {
+                "description": "an integer is valid",
+                "data": 12,
+                "valid": true
+            }
+        ]
+    },
+    {
+        "description": "ref to else",
+        "schema": {
+            "allOf": [
+                {"$ref": "http://example.com/ref/else"},
+                {
+                    "else": {
+                        "$id": "http://example.com/ref/else",
+                        "type": "integer"
+                    }
+                }
+            ]
+        },
+        "tests": [
+            {
+                "description": "a non-integer is invalid due to the $ref",
+                "data": "foo",
+                "valid": false
+            },
+            {
+                "description": "an integer is valid",
+                "data": 12,
+                "valid": true
+            }
+        ]
+    },
+    {
+        "description": "ref with absolute-path-reference",
+        "schema": {
+            "$id": "http://example.com/ref/absref.json",
+            "definitions": {
+                "a": {
+                    "$id": "http://example.com/ref/absref/foobar.json",
+                    "type": "number"
+                 },
+                 "b": {
+                     "$id": "http://example.com/absref/foobar.json",
+                     "type": "string"
+                 }
+            },
+            "allOf": [
+                { "$ref": "/absref/foobar.json" }
+            ]
+        },
+        "tests": [
+            {
+                "description": "a string is valid",
+                "data": "foo",
+                "valid": true
+            },
+            {
+                "description": "an integer is invalid",
+                "data": 12,
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "$id with file URI still resolves pointers - *nix",
+        "schema": {
+            "$id": "file:///folder/file.json",
+            "definitions": {
+                "foo": {
+                    "type": "number"
+                }
+            },
+            "allOf": [
+                {
+                    "$ref": "#/definitions/foo"
+                }
+            ]
+        },
+        "tests": [
+            {
+                "description": "number is valid",
+                "data": 1,
+                "valid": true
+            },
+            {
+                "description": "non-number is invalid",
+                "data": "a",
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "$id with file URI still resolves pointers - windows",
+        "schema": {
+            "$id": "file:///c:/folder/file.json",
+            "definitions": {
+                "foo": {
+                    "type": "number"
+                }
+            },
+            "allOf": [
+                {
+                    "$ref": "#/definitions/foo"
+                }
+            ]
+        },
+        "tests": [
+            {
+                "description": "number is valid",
+                "data": 1,
+                "valid": true
+            },
+            {
+                "description": "non-number is invalid",
+                "data": "a",
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "empty tokens in $ref json-pointer",
+        "schema": {
+            "definitions": {
+                "": {
+                    "definitions": {
+                        "": { "type": "number" }
+                    }
+                } 
+            },
+            "allOf": [
+                {
+                    "$ref": "#/definitions//definitions/"
+                }
+            ]
+        },
+        "tests": [
+            {
+                "description": "number is valid",
+                "data": 1,
+                "valid": true
+            },
+            {
+                "description": "non-number is invalid",
+                "data": "a",
                 "valid": false
             }
         ]

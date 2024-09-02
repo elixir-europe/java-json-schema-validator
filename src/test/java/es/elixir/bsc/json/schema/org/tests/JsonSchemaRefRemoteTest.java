@@ -20,7 +20,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
- *****************************************************************************
+ * *****************************************************************************
  */
 
 package es.elixir.bsc.json.schema.org.tests;
@@ -30,37 +30,12 @@ import org.junit.Test;
 /**
  * @author Dmitry Repchevsky
  */
-
-public class JsonSchemaUniqueItemsTest extends JsonSchemaOrgTest {
+public class JsonSchemaRefRemoteTest extends JsonSchemaOrgTest {
     
-    private final static String JSON_DRAFT4_TEST_FILE = "json-schema-org/tests/draft4/uniqueItems.json";
-    private final static String JSON_DRAFT6_TEST_FILE = "json-schema-org/tests/draft6/uniqueItems.json";
-    private final static String JSON_DRAFT7_TEST_FILE = "json-schema-org/tests/draft7/uniqueItems.json";
-    private final static String JSON_DRAFT201909_TEST_FILE = "json-schema-org/tests/draft2019-09/uniqueItems.json";
-    private final static String JSON_DRAFT202012_TEST_FILE = "json-schema-org/tests/draft2020-12/uniqueItems.json";
+    private final static String JSON_DRAFT4_TEST_FILE = "json-schema-org/tests/draft4/refRemote.json";
     
-    @Test
-    public void test_draft4() {
-        test(JSON_DRAFT4_TEST_FILE);
-    }
-    
-    @Test
-    public void test_draft6() {
-        test(JSON_DRAFT6_TEST_FILE);
-    }
-
-    @Test
-    public void test_draft7() {
-        test(JSON_DRAFT7_TEST_FILE);
-    }
-    
-    @Test
-    public void test_draft201909() {
-        test(JSON_DRAFT201909_TEST_FILE);
-    }
-    
-    @Test
-    public void test_draft202012() {
-        test(JSON_DRAFT202012_TEST_FILE);
-    }
+//    @Test
+//    public void test_draft4() {
+//        test(JSON_DRAFT4_TEST_FILE);
+//    }
 }

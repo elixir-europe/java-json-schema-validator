@@ -1,5 +1,24 @@
 [
     {
+        "description": "additionalItems as schema",
+        "schema": {
+            "items": [{}],
+            "additionalItems": {"type": "integer"}
+        },
+        "tests": [
+            {
+                "description": "additional items match schema",
+                "data": [ null, 2, 3, 4 ],
+                "valid": true
+            },
+            {
+                "description": "additional items do not match schema",
+                "data": [ null, 2, 3, "foo" ],
+                "valid": false
+            }
+        ]
+    },
+    {
         "description": "when items is schema, additionalItems does nothing",
         "schema": {
             "items": {},
@@ -124,6 +143,25 @@
                 "description": "wrong type of second item",
                 "data": [ "x", "y" ],
                 "valid": false
+            }
+        ]
+    },
+    {
+        "description": "additionalItems with heterogeneous array",
+        "schema": {
+            "items": [{}],
+            "additionalItems": false
+        },
+        "tests": [
+            {
+                "description": "heterogeneous invalid instance",
+                "data": [ "foo", "bar", 37 ],
+                "valid": false
+            },
+            {
+                "description": "valid instance",
+                "data": [ null ],
+                "valid": true
             }
         ]
     },
