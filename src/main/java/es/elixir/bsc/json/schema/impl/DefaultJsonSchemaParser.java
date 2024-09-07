@@ -55,12 +55,13 @@ import es.elixir.bsc.json.schema.model.impl.JsonMultitypeSchemaWrapper;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
-import java.util.WeakHashMap;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
 import jakarta.json.JsonValue.ValueType;
+import static jakarta.json.JsonValue.ValueType.ARRAY;
+import static jakarta.json.JsonValue.ValueType.STRING;
 
 /**
  * @author Dmitry Repchevsky
@@ -68,8 +69,8 @@ import jakarta.json.JsonValue.ValueType;
 
 public class DefaultJsonSchemaParser implements JsonSubschemaParser {
     
+    private final JsonSchemaElementsCache cache = new JsonSchemaElementsCache();
     private final Map<String, Object> properties;
-    private final Map<AbstractJsonSchema, AbstractJsonSchema> cache = new WeakHashMap();
     
     public DefaultJsonSchemaParser(Map<String, Object> properties) {
         this.properties = properties;
@@ -85,6 +86,11 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
             String jsonPointer, JsonValue value, JsonType type) 
             throws JsonSchemaException {
 
+        AbstractJsonSchema schema = cache.get(locator, jsonPointer);
+        if (schema != null) {
+            return schema;
+        }
+
         if (value.getValueType() == ValueType.TRUE ||
             value.getValueType() == ValueType.FALSE) {
             return new BooleanJsonSchemaImpl(parent, locator, jsonPointer).read(this, value);
@@ -94,7 +100,7 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
                 throw new JsonSchemaException(new ParsingError(
                         ParsingMessage.SCHEMA_OBJECT_ERROR, value.getValueType()));
         }
-
+                
         final JsonObject object = value.asJsonObject();
         
         final JsonValue jref = object.get(JsonReference.REF);
@@ -110,6 +116,27 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
             }
         }
         
+        JsonValue $id = object.get(JsonSchema.ID);
+        if ($id == null) {
+            $id = object.get("id"); // draft4
+        } 
+
+        if ($id != null) {
+            if ($id.getValueType() != JsonValue.ValueType.STRING) {
+                throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
+                    "id", $id.getValueType().name(), JsonValue.ValueType.STRING.name()));
+            } else if (!(parent instanceof JsonMultitypeSchemaWrapper)) {
+                // special case for wrapper parent - we already resolved $id there!!!
+                final String id = ((JsonString)$id).getString();
+                try {
+                    locator = locator.resolve(URI.create(id));
+                    locator.setSchema(object);
+                } catch(IllegalArgumentException ex) {
+                    throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_REFERENCE, id));
+                }
+            }
+        }
+
         final JsonValue type_value = object.get(TYPE);
         final ValueType vtype;
         if (type_value == null) {
@@ -134,62 +161,37 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
         }
 
         if (type == null) {
-            return new JsonMultitypeSchemaWrapper(parent, locator, jsonPointer, 
-                    vtype == ValueType.ARRAY ? type_value.asJsonArray() : null)
-                    .read(this, object);
-        }
-        
-        JsonValue $id = object.get(JsonSchema.ID);
-        if ($id == null) {
-            $id = object.get("id"); // draft4
-        } 
-
-        if ($id != null) {
-            if ($id.getValueType() != JsonValue.ValueType.STRING) {
-                throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                    "id", $id.getValueType().name(), JsonValue.ValueType.STRING.name()));
-            } else {
-                final String id = ((JsonString)$id).getString();
-                try {
-                    locator = locator.resolve(URI.create(id));
-                    locator.setSchema(object);
-                } catch(IllegalArgumentException ex) {
-                    throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_REFERENCE, id));
+            schema = new JsonMultitypeSchemaWrapper(parent, locator, jsonPointer, 
+                    vtype == ValueType.ARRAY ? type_value.asJsonArray() : null);
+        } else {
+            final JsonArray jenum = JsonSchemaUtil.check(object.get(ENUM), JsonValue.ValueType.ARRAY);
+            if (jenum != null) {
+                if (jenum.isEmpty()) {
+                    throw new JsonSchemaException(new ParsingError(ParsingMessage.EMPTY_ENUM));
                 }
+                return new JsonEnumImpl(parent, locator, jsonPointer).read(this, object);
             }
-        }
-        
-        final JsonArray jenum = JsonSchemaUtil.check(object.get(ENUM), JsonValue.ValueType.ARRAY);
-        if (jenum != null) {
-            if (jenum.isEmpty()) {
-                throw new JsonSchemaException(new ParsingError(ParsingMessage.EMPTY_ENUM));
+
+            final JsonValue jconst = object.get(CONST);
+            if (jconst != null) {
+                return new JsonConstImpl(parent, locator, jsonPointer).read(this, object);
             }
-            return new JsonEnumImpl(parent, locator, jsonPointer).read(this, object);
-        }
 
-        final JsonValue jconst = object.get(CONST);
-        if (jconst != null) {
-            return new JsonConstImpl(parent, locator, jsonPointer).read(this, object);
-        }
-
-        final AbstractJsonSchema schema;
-        switch(type) {
-            case OBJECT: schema = new JsonObjectSchemaImpl(parent, locator, jsonPointer); break;
-            case ARRAY: schema = new JsonArraySchemaImpl(parent, locator, jsonPointer); break;
-            case STRING: schema = new JsonStringSchemaImpl(parent, locator, jsonPointer); break;
-            case NUMBER: schema = new JsonNumberSchemaImpl(parent, locator, jsonPointer); break;
-            case INTEGER: schema = new JsonIntegerSchemaImpl(parent, locator, jsonPointer); break;
-            case BOOLEAN: schema = new JsonBooleanSchemaImpl(parent, locator, jsonPointer); break;
-            case NULL: schema = new JsonNullSchemaImpl(parent, locator, jsonPointer); break;
-            default: return null;
+            switch(type) {
+                case OBJECT: schema = new JsonObjectSchemaImpl(parent, locator, jsonPointer); break;
+                case ARRAY: schema = new JsonArraySchemaImpl(parent, locator, jsonPointer); break;
+                case STRING: schema = new JsonStringSchemaImpl(parent, locator, jsonPointer); break;
+                case NUMBER: schema = new JsonNumberSchemaImpl(parent, locator, jsonPointer); break;
+                case INTEGER: schema = new JsonIntegerSchemaImpl(parent, locator, jsonPointer); break;
+                case BOOLEAN: schema = new JsonBooleanSchemaImpl(parent, locator, jsonPointer); break;
+                case NULL: schema = new JsonNullSchemaImpl(parent, locator, jsonPointer); break;
+                default: return null;
+            }
         }
         
         AbstractJsonSchema sch = cache.get(schema);
         if (sch == null) {
-            sch = schema.read(this, object);
-            if (!sch.isDynamicScope()) {
-                cache.put(sch, sch);
-            }
+            sch = cache.put(schema.read(this, object));
         }
         return sch;
     }

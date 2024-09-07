@@ -229,7 +229,7 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
 
         final JsonArray jallOf = JsonSchemaUtil.check(object.get(ALL_OF), JsonValue.ValueType.ARRAY);
         if (jallOf != null) {
-            final JsonAllOfImpl _allOf = new JsonAllOfImpl(this, locator, jsonPointer + "/" + ALL_OF)
+            final JsonAllOfImpl _allOf = new JsonAllOfImpl(this, locator, getJsonPointer() + "/" + ALL_OF)
                     .read(parser, jallOf);
             if (allOf == null) {
                 allOf = _allOf;
@@ -242,13 +242,13 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
         
         final JsonArray janyOf = JsonSchemaUtil.check(object.get(ANY_OF), JsonValue.ValueType.ARRAY);
         if (janyOf != null) {
-            anyOf = new JsonAnyOfImpl(this, locator, jsonPointer + "/" + ANY_OF);
+            anyOf = new JsonAnyOfImpl(this, locator, getJsonPointer() + "/" + ANY_OF);
             anyOf.read(parser, janyOf);
         }
         
         final JsonArray joneOf = JsonSchemaUtil.check(object.get(ONE_OF), JsonValue.ValueType.ARRAY);
         if (joneOf != null) {
-            oneOf = new JsonOneOfImpl(this, locator, jsonPointer + "/" + ONE_OF);
+            oneOf = new JsonOneOfImpl(this, locator, getJsonPointer() + "/" + ONE_OF);
             oneOf.read(parser, joneOf);
         }
 
@@ -257,7 +257,7 @@ public class PrimitiveSchemaImpl extends AbstractJsonSchema<JsonObject>
             switch(jnot.getValueType()) {
                 case OBJECT:
                 case TRUE:
-                case FALSE: not = new JsonNotImpl(this, locator, jsonPointer + "/" + NOT)
+                case FALSE: not = new JsonNotImpl(this, locator, getJsonPointer() + "/" + NOT)
                                         .read(parser, jnot);
                             break;
                 default: throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 

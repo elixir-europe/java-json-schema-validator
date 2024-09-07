@@ -121,7 +121,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
     public JsonProperties getDependentSchemas() {
         if (dependentSchemas == null) {
             dependentSchemas = new JsonPropertiesImpl(this, 
-                    locator, jsonPointer + "/" + DEPENDENT_SCHEMAS);
+                    locator, getJsonPointer() + "/" + DEPENDENT_SCHEMAS);
         }
         return dependentSchemas;
     }
@@ -130,7 +130,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
     public JsonDependentProperties getDependentRequired() {
         if (dependentRequired == null) {
             dependentRequired = new JsonDependentPropertiesImpl(this, 
-                    locator, jsonPointer + "/" + DEPENDENT_REQUIRED);
+                    locator, getJsonPointer() + "/" + DEPENDENT_REQUIRED);
         }
         return dependentRequired;
     }
@@ -173,7 +173,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
         
         final JsonObject jproperties = JsonSchemaUtil.check(object.get(PROPERTIES), ValueType.OBJECT);
         if (jproperties != null) {
-            properties = new JsonPropertiesImpl(this, locator, jsonPointer + "/" + PROPERTIES)
+            properties = new JsonPropertiesImpl(this, locator, getJsonPointer() + "/" + PROPERTIES)
                     .read(parser, jproperties);
         }
 
@@ -189,7 +189,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
 
         final JsonObject jpatternProperties = JsonSchemaUtil.check(object.get(PATTERN_PROPERTIES), ValueType.OBJECT);
         if (jpatternProperties != null) {
-            patternProperties = new JsonPropertiesImpl(this, locator, jsonPointer + "/" + PATTERN_PROPERTIES)
+            patternProperties = new JsonPropertiesImpl(this, locator, getJsonPointer() + "/" + PATTERN_PROPERTIES)
                     .read(parser, jpatternProperties);
         }
         
@@ -228,13 +228,13 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
         final JsonObject jdependentSchemas = JsonSchemaUtil.check(object.get(DEPENDENT_SCHEMAS), ValueType.OBJECT);
         if (jdependentSchemas != null) {
             dependentSchemas = new JsonPropertiesImpl(this, locator, 
-                    jsonPointer + "/" + DEPENDENT_SCHEMAS).read(parser, jdependentSchemas);
+                    getJsonPointer() + "/" + DEPENDENT_SCHEMAS).read(parser, jdependentSchemas);
         }
 
         final JsonObject jdependentRequired = JsonSchemaUtil.check(object.get(DEPENDENT_REQUIRED), ValueType.OBJECT);
         if (jdependentRequired != null) {
             dependentRequired = new JsonDependentPropertiesImpl(this, locator, 
-                    jsonPointer + "/" + DEPENDENT_REQUIRED).read(parser, jdependentRequired);
+                    getJsonPointer() + "/" + DEPENDENT_REQUIRED).read(parser, jdependentRequired);
         }
         
         final JsonObject jdependencies = JsonSchemaUtil.check(object.get(DEPENDENCIES), ValueType.OBJECT);

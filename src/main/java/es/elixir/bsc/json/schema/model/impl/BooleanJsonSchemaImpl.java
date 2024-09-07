@@ -54,7 +54,7 @@ public class BooleanJsonSchemaImpl extends AbstractJsonSchema<JsonValue>
             JsonSchemaLocator locator, String jsonPointer) {
         super(parent, locator, jsonPointer);
     }
-    
+
     @Override
     public Stream<JsonSchemaElement> getChildren() {
         return Stream.empty();

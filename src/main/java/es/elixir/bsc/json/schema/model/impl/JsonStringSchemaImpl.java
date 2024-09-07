@@ -151,7 +151,7 @@ public class JsonStringSchemaImpl extends PrimitiveSchemaImpl
         
         return nerrors == errors.size();
     }
-
+    
     private void validate(String jsonPointer, String string, List<ValidationError> errors) {
         
         if (minLength != null && string.codePointCount(0, string.length()) < minLength) {

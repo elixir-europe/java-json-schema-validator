@@ -81,7 +81,7 @@ public abstract class AbstractJsonReferenceImpl extends AbstractJsonSchema<JsonO
                     ref_locator = locator;
                 } else {
                     ref_locator = locator.resolve(
-                        new URI(ref.getScheme(), ref.getSchemeSpecificPart(), null));                        
+                        new URI(ref.getScheme(), ref.getSchemeSpecificPart(), null));
                 }
             } else {
                 ref_pointer = "/";

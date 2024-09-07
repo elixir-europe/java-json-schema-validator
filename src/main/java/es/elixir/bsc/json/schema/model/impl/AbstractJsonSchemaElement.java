@@ -28,7 +28,7 @@ package es.elixir.bsc.json.schema.model.impl;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import java.net.URI;
-import java.util.Objects;
+import java.net.URISyntaxException;
 
 /**
  * This is an root class that any JSON Schema element inherits from.
@@ -68,12 +68,22 @@ public abstract class AbstractJsonSchemaElement
 
     @Override
     public final URI getId() {
-        return locator.uri;
+        final String pointer = getJsonPointer();
+        final String fragment = locator.uri.getFragment();
+        try {
+            return new URI(locator.uri.getScheme(), locator.uri.getSchemeSpecificPart(), 
+                    fragment == null && pointer.length() > 1 ? pointer : pointer.length() > 1 
+                            ? fragment + pointer : fragment);
+        } catch (URISyntaxException ex) {}
+        return null;
     }
 
     @Override
     public String getJsonPointer() {
-        return parent == null || parent.locator != locator ? "/" : jsonPointer;
+        if (parent instanceof JsonMultitypeSchemaWrapper) {
+            return parent.getJsonPointer();
+        }
+        return parent != null && parent.locator.uri.equals(locator.uri) ? jsonPointer : "/";
     }
 
     @Override
@@ -81,7 +91,6 @@ public abstract class AbstractJsonSchemaElement
         return parent;
     }
     
-
     /**
      * This is a marker whether this element is in the dynamic scope and 
      * must not be cached.
@@ -95,28 +104,6 @@ public abstract class AbstractJsonSchemaElement
     protected void setDynamicScope(boolean isDynamicScope) {
         this.isDynamicScope = isDynamicScope;
     }
-        
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj instanceof AbstractJsonSchemaElement other &&
-            this.getClass() == obj.getClass()) {
-            return Objects.equals(jsonPointer, other.jsonPointer) &&
-                   Objects.equals(locator.uri, other.locator.uri);
-        }
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 31 * hash + Objects.hashCode(this.locator.uri);
-        hash = 31 * hash + Objects.hashCode(this.jsonPointer);
-        hash = 31 * hash + Objects.hashCode(this.getClass().hashCode());
-        return hash;
-    }
     
     @Override
     public Object clone() throws CloneNotSupportedException { 
@@ -124,11 +111,12 @@ public abstract class AbstractJsonSchemaElement
     }
     
     /**
-     * Predicate to create a clone of this element linked another parent.
+     * Predicate to create a clone of this element linked to another parent.
+     * If the element's parent is the same as provided parent, no clone is created.
      * 
      * @param parent - the parent to be assigned to the cloned element
      * 
-     * @return the clone of this element
+     * @return the clone of this element or element itself if parents are the same
      */
     protected AbstractJsonSchemaElement relink(AbstractJsonSchemaElement parent) {
         if (this.parent != parent) {

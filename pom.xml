@@ -24,7 +24,7 @@
 
     <groupId>es.elixir.bsc.json.schema</groupId>
     <artifactId>jakarta.jaronuinga</artifactId>
-    <version>0.5.5-SNAPSHOT</version>
+    <version>0.5.5</version>
     <packaging>jar</packaging>
 
     <organization>
