@@ -32,6 +32,8 @@ import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonReference;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.stream.Stream;
 import javax.json.JsonException;
 import javax.json.JsonObject;
@@ -78,9 +80,24 @@ public class JsonReferenceImpl extends AbstractJsonReferenceImpl implements Json
                     throw new JsonSchemaException(
                             new ParsingError(ParsingMessage.UNRESOLVABLE_REFERENCE, ref));
                 }
+                
+                AbstractJsonSchemaElement root = this;
 
-                schema = parser.parse(ref_locator, this, ref_pointer, jsubschema, null);
-            } catch(IOException | JsonException | IllegalArgumentException ex) {
+                if (!locator.uri.equals(ref_locator.uri)) {
+                    // if the reference goes inside other document or points to tha 'anchor',
+                    // parse this document as a 'parent'
+                    if (ref_pointer.length() > 1) {
+                        final JsonValue val = ref_locator.getSchema("/");
+                        root = parser.parse(ref_locator, this, "/", val, null);              
+                    } else if (ref_locator.uri.getFragment() != null) {
+                        final JsonValue val = ref_locator.getSchema("/");
+                        root = parser.parse(ref_locator.resolve(
+                                new URI(ref_locator.uri.getScheme(), ref_locator.uri.getSchemeSpecificPart(), null)), 
+                                this, "/", val, null);
+                    }
+                }
+                schema = parser.parse(ref_locator, root, ref_pointer, jsubschema, null);
+            } catch(IOException | JsonException | IllegalArgumentException | URISyntaxException ex) {
                 throw new JsonSchemaException(
                     new ParsingError(ParsingMessage.INVALID_REFERENCE, ref));
             }

@@ -25,6 +25,7 @@
 
 package es.elixir.bsc.json.schema.org.tests;
 
+import es.elixir.bsc.json.schema.JsonSchemaVersion;
 import org.junit.Test;
 
 /**
@@ -33,9 +34,33 @@ import org.junit.Test;
 public class JsonSchemaRefRemoteTest extends JsonSchemaOrgTest {
     
     private final static String JSON_DRAFT4_TEST_FILE = "json-schema-org/tests/draft4/refRemote.json";
+    private final static String JSON_DRAFT6_TEST_FILE = "json-schema-org/tests/draft6/refRemote.json";
+    private final static String JSON_DRAFT7_TEST_FILE = "json-schema-org/tests/draft7/refRemote.json";
+    private final static String JSON_DRAFT201909_TEST_FILE = "json-schema-org/tests/draft2019-09/refRemote.json";
+    private final static String JSON_DRAFT202012_TEST_FILE = "json-schema-org/tests/draft2020-12/refRemote.json";
     
-//    @Test
-//    public void test_draft4() {
-//        test(JSON_DRAFT4_TEST_FILE);
-//    }
+    @Test
+    public void test_draft4() {
+        test(JSON_DRAFT4_TEST_FILE);
+    }
+    
+    @Test
+    public void test_draft6() {
+        test(JSON_DRAFT6_TEST_FILE, JsonSchemaVersion.SCHEMA_DRAFT_06);
+    }
+
+    @Test
+    public void test_draft7() {
+        test(JSON_DRAFT7_TEST_FILE, JsonSchemaVersion.SCHEMA_DRAFT_07);
+    }
+    
+    @Test
+    public void test_draft201909() {
+        test(JSON_DRAFT201909_TEST_FILE, JsonSchemaVersion.SCHEMA_DRAFT_2019_09);
+    }
+   
+    @Test
+    public void test_draft202012() {
+        test(JSON_DRAFT202012_TEST_FILE, JsonSchemaVersion.SCHEMA_DRAFT_2020_12);
+    }
 }

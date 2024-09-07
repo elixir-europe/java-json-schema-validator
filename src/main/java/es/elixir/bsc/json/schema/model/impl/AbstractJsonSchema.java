@@ -37,7 +37,7 @@ import java.util.List;
 import javax.json.JsonValue;
 
 /**
- * This interface is used internally and exists only for the purpose to hide
+ * This class is used internally and exists only for the purpose to hide
  * actual validate() method from the outside.
  * 
  * @author Dmitry Repchevsky

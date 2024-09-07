@@ -72,37 +72,41 @@ public class JsonDynamicReferenceImpl extends JsonReferenceImpl
                         e = parser.parse(ref_locator, null, "/", value, null);
                     }
                     schema = getSchema(e, ref);
+                    
+                    // if no default '$dynamicAnchor' found - skip further 
+                    // '$dynamicAnchor'(s) search - treat as usual '$ref'.
                     if (schema != null) {
                         final URI uri = new URI(null, null, fragment);
+                        e = this;
                         while ((e = e.getParent()) != null) {
-                            final AbstractJsonSchemaElement s = getSchema(e, uri);
-                            if (s != null) {
-                                schema = s;
+                            if ("/".equals(e.getJsonPointer())) {
+                                final AbstractJsonSchemaElement s = getSchema(e, uri);
+                                if (s != null) {
+                                    schema = s;
+                                }        
                             }
-
                         }
                     }
                 } catch (IOException | URISyntaxException ex) {}
             }
         }
-        
+
         if (schema == null && super.getSchema() == null) {
             throw new JsonSchemaException(
                 new ParsingError(ParsingMessage.UNRESOLVABLE_REFERENCE, ref));
-        }
-        
+        }       
         return schema;
     }
 
     private AbstractJsonSchemaElement getSchema(AbstractJsonSchemaElement e, URI uri)
             throws IOException, JsonSchemaException {
         final String fragment = uri.getFragment();
-        final JsonSchemaLocator l = e.locator.resolve(uri);
+        final JsonSchemaLocator l = e.locator.resolve(uri);  
         final JsonValue value = l.getSchema("/");
         if (value instanceof JsonObject jsubschema) {
             final String anchor = jsubschema.getString(DYNAMIC_ANCHOR, null);
             if (fragment.equals(anchor)) {
-                return parser.parse(l, this, e.getJsonPointer(), jsubschema, null);
+                return parser.parse(l, this, "/", jsubschema, null);
             }
         }
         return null;
