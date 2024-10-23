@@ -61,6 +61,11 @@ public class DefaultJsonSchemaReader implements JsonSchemaReader {
     }
     
     @Override
+    public JsonSchemaLocator getJsonSchemaLocator(URI uri) {
+        return new DefaultJsonSchemaLocator(uri);
+    }
+    
+    @Override
     public JsonSchema read(URL url) throws JsonSchemaException {
         try {
             return read(new DefaultJsonSchemaLocator(url.toURI()));

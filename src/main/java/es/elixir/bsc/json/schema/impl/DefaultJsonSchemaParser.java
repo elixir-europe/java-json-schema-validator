@@ -86,6 +86,9 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
             String jsonPointer, JsonValue value, JsonType type) 
             throws JsonSchemaException {
 
+        // much easily catch 'invalid' root json pointer here than check for the '/' root in callers.
+        jsonPointer = jsonPointer.startsWith("//") ? jsonPointer.substring(1) : jsonPointer;
+        
         AbstractJsonSchema schema = cache.get(locator, jsonPointer);
         if (schema != null) {
             return schema;
