@@ -61,9 +61,8 @@ public abstract class AbstractJsonSchemaElement
             JsonSchemaLocator locator, String jsonPointer) {
 
         this.parent = parent;
-
         this.locator = locator;
-        this.jsonPointer = jsonPointer.startsWith("//") ? jsonPointer.substring(1) : jsonPointer;
+        this.jsonPointer = jsonPointer;
     }
 
     @Override

@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -59,7 +59,7 @@ public class DefaultJsonSchemaLocator extends JsonSchemaLocator {
     protected final Map<URI, JsonValue> schemas;
 
     public DefaultJsonSchemaLocator(URI uri) {
-        this(uri, new HashMap<>());
+        this(uri, new HashMap());
     }
     
     protected DefaultJsonSchemaLocator(URI uri, Map<URI, JsonValue> schemas) {

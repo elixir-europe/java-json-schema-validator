@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2024 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -26,6 +26,7 @@
 package es.elixir.bsc.json.schema;
 
 import es.elixir.bsc.json.schema.model.JsonSchema;
+import java.net.URI;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Iterator;
@@ -39,21 +40,70 @@ import java.util.ServiceLoader;
 public interface JsonSchemaReader {
     
     /**
+     * Read JSON Schema located by the provided URL.
+     * The reader uses a new instance of JsonSchemaLocator.
      * 
-     * @param url the URL to read Json Schema from.
+     * @param url the URL to read a JSON Schema from.
      * @return parsed JsonSchema object
+     * 
      * @throws JsonSchemaException 
      */
     JsonSchema read(URL url) throws JsonSchemaException;
+    
+    /**
+     * Read JSON Schema located by the provided JsonSchemaLocator.
+     * This allows reuse the same JsonSchemaLocator instance between calls.
+     * 
+     * @param locator JsonSchemaLocator to locate parsed JSON Schema.
+     * @return parsed JsonSchema object
+     * 
+     * @throws JsonSchemaException 
+     */    
     JsonSchema read(JsonSchemaLocator locator) throws JsonSchemaException;
     
+    /**
+     * Creates new instance of default implementation of the JsonSchemaLocator.
+     * 
+     * @param uri the JSON Schema location URI
+     * 
+     * @return JsonSchemaLocator
+     */
+    JsonSchemaLocator getJsonSchemaLocator(URI uri);
+
+    /**
+     * Set configuration property for this JsonSchemaReader.
+     * 
+     * @param name configuration property name
+     * @param property configuration property value
+     */
     void setJsonSchemaParserProperty(String name, Object property);
-    
-    public static JsonSchemaReader getReader() {
+        
+    /**
+     * Create JsonSchemaReader with no configuration parameters.
+     * 
+     * @return new instance of the JsonSchemaReader
+     */
+    static JsonSchemaReader getReader() {
         return getReader(Collections.EMPTY_MAP);
     }
     
-    public static JsonSchemaReader getReader(Map<String, Object> config) {
+    /**
+     * Create JsonSchemaReader with provided configuration properties.
+     * 
+     * <pre>
+     * example:
+     * {@code
+     * JsonSchemaParserConfig config = 
+     *     new JsonSchemaParserConfig()
+     *         .setJsonSchemaVersion(JsonSchemaVersion.SCHEMA_DRAFT_2020_12);
+     * JsonSchemaReader reader = JsonSchemaReader.getReader(config);
+     * }</pre>
+     * 
+     * @param config the map of configuration properties
+     * 
+     * @return new instance of the JsonSchemaReader
+     */
+    static JsonSchemaReader getReader(Map<String, Object> config) {
         ServiceLoader<JsonSchemaReader> loader = ServiceLoader.load(JsonSchemaReader.class);
         Iterator<JsonSchemaReader> iterator = loader.iterator();
 

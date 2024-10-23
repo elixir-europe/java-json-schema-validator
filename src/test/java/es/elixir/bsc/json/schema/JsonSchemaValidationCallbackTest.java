@@ -26,7 +26,6 @@
 package es.elixir.bsc.json.schema;
 
 import es.elixir.bsc.json.schema.model.JsonSchema;
-import es.elixir.bsc.json.schema.model.PrimitiveSchema;
 import javax.json.Json;
 import javax.json.JsonStructure;
 import javax.json.JsonValue;
@@ -62,7 +61,8 @@ public class JsonSchemaValidationCallbackTest {
             
             final AtomicInteger counter = new AtomicInteger();
             List<ValidationError> errors = new ArrayList<>();
-            schema.validate(json, errors, (PrimitiveSchema model, String pointer, JsonValue value, JsonValue parent, List<ValidationError> err) -> {
+            schema.validate(json, errors, (JsonSchema model, String pointer, 
+                    JsonValue value, JsonValue parent, List<ValidationError> err) -> {
                 counter.incrementAndGet();
             });
 
